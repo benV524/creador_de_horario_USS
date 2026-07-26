@@ -127,6 +127,14 @@ function App() {
     setVista('horario')
   }, [])
 
+  /** Vacía el horario para empezar de cero. Los guardados no se tocan. */
+  const nuevoHorario = useCallback(() => {
+    setPaquetes([])
+    setHorarioActivoId(null)
+    setVista('horario')
+    notificar('Horario vacío listo para empezar de nuevo.')
+  }, [notificar])
+
   const cambiarPaquete = useCallback((claveAnterior, nuevo) => {
     setPaquetes((prev) => prev.map((p) => (p.clave === claveAnterior ? nuevo : p)))
     notificar(`${nuevo.ramo}: ahora tomas ${describirPaquete(nuevo)}.`)
@@ -136,6 +144,14 @@ function App() {
     () => horariosGuardados.find((h) => h.id === horarioActivoId) ?? null,
     [horariosGuardados, horarioActivoId],
   )
+
+  // Sirve para avisar antes de descartar: un horario recién armado o uno abierto que
+  // se modificó todavía no están respaldados.
+  const hayCambiosSinGuardar = useMemo(() => {
+    if (paquetes.length === 0) return false
+    if (!horarioActivo) return true
+    return JSON.stringify(serializarPaquetes(paquetes)) !== JSON.stringify(horarioActivo.entradas)
+  }, [paquetes, horarioActivo])
 
   /** Toda escritura pasa por aquí para mantener estado y localStorage en sincronía. */
   const persistir = useCallback((nuevaLista, mensajeExito) => {
@@ -297,8 +313,10 @@ function App() {
                 onCambiarPaquete={cambiarPaquete}
                 onNotificar={notificar}
                 horarioActivo={horarioActivo}
+                hayCambiosSinGuardar={hayCambiosSinGuardar}
                 onGuardarNuevo={guardarNuevo}
                 onActualizarActivo={actualizarActivo}
+                onNuevoHorario={nuevoHorario}
               />
             )}
 
@@ -329,9 +347,11 @@ function App() {
                 cursosPorNrc={cursosPorNrc}
                 franjas={datos.franjas}
                 activoId={horarioActivoId}
+                hayCambiosSinGuardar={hayCambiosSinGuardar}
                 onAbrir={abrirGuardado}
                 onEliminar={eliminarGuardado}
                 onRenombrar={renombrarGuardado}
+                onNuevoHorario={nuevoHorario}
                 onNotificar={notificar}
               />
             )}

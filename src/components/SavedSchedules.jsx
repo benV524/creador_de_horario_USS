@@ -14,12 +14,19 @@ function Fecha({ marca }) {
 }
 
 export default function SavedSchedules({
-  horarios, cursosPorNrc, franjas, activoId, onAbrir, onEliminar, onRenombrar, onNotificar,
+  horarios, cursosPorNrc, franjas, activoId, hayCambiosSinGuardar,
+  onAbrir, onEliminar, onRenombrar, onNuevoHorario, onNotificar,
 }) {
   const [menuAbierto, setMenuAbierto] = useState(null)
   const [editando, setEditando] = useState(null)
   const [nombreEditado, setNombreEditado] = useState('')
+  const [confirmandoNuevo, setConfirmandoNuevo] = useState(false)
   const contenedorRef = useRef(null)
+
+  const pedirNuevo = () => {
+    if (hayCambiosSinGuardar) setConfirmandoNuevo(true)
+    else onNuevoHorario()
+  }
 
   // Cerrar el menú de descarga al hacer clic fuera.
   useEffect(() => {
@@ -60,21 +67,69 @@ export default function SavedSchedules({
     setEditando(null)
   }
 
+  const barra = (
+    <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+      <p className="text-sm text-gray-500 dark:text-gray-400">
+        {horarios.length === 0
+          ? 'Sin horarios guardados'
+          : `${horarios.length} horario${horarios.length === 1 ? '' : 's'} guardado${horarios.length === 1 ? '' : 's'}`}
+      </p>
+      <button
+        type="button"
+        onClick={pedirNuevo}
+        className="rounded-lg bg-purple-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-purple-700"
+      >
+        + Nuevo horario
+      </button>
+    </div>
+  )
+
+  const aviso = confirmandoNuevo && (
+    <div className="mb-3 rounded-lg border border-amber-300 bg-amber-50 px-3 py-2 dark:border-amber-800 dark:bg-amber-950/40">
+      <p className="text-xs text-amber-800 dark:text-amber-300">
+        El horario que tienes abierto no está guardado. Si empiezas uno nuevo se pierde.
+      </p>
+      <div className="mt-2 flex gap-2">
+        <button
+          type="button"
+          onClick={() => { setConfirmandoNuevo(false); onNuevoHorario() }}
+          className="rounded-md bg-amber-600 px-3 py-1 text-xs font-medium text-white hover:bg-amber-700"
+        >
+          Empezar de nuevo
+        </button>
+        <button
+          type="button"
+          onClick={() => setConfirmandoNuevo(false)}
+          className="rounded-md border border-amber-400 px-3 py-1 text-xs font-medium text-amber-800 hover:bg-amber-100 dark:text-amber-300 dark:hover:bg-amber-950"
+        >
+          Cancelar
+        </button>
+      </div>
+    </div>
+  )
+
   if (horarios.length === 0) {
     return (
-      <div className="rounded-xl border border-dashed border-gray-300 bg-white py-16 text-center dark:border-gray-700 dark:bg-gray-900">
-        <p className="text-sm text-gray-500 dark:text-gray-400">
-          Todavía no has guardado ningún horario.
-        </p>
-        <p className="mt-1 text-xs text-gray-400">
-          Arma uno en "Mi horario" y usa el botón <strong>Guardar horario</strong>.
-        </p>
+      <div>
+        {barra}
+        {aviso}
+        <div className="rounded-xl border border-dashed border-gray-300 bg-white py-16 text-center dark:border-gray-700 dark:bg-gray-900">
+          <p className="text-sm text-gray-500 dark:text-gray-400">
+            Todavía no has guardado ningún horario.
+          </p>
+          <p className="mt-1 text-xs text-gray-400">
+            Arma uno en "Mi horario" y usa el botón <strong>Guardar horario</strong>.
+          </p>
+        </div>
       </div>
     )
   }
 
   return (
-    <div ref={contenedorRef} className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+    <div ref={contenedorRef}>
+      {barra}
+      {aviso}
+      <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
       {reconstruidos.map(({ guardado, paquetes, faltantes }) => {
         const esActivo = guardado.id === activoId
         return (
@@ -199,6 +254,7 @@ export default function SavedSchedules({
           </div>
         )
       })}
+      </div>
     </div>
   )
 }

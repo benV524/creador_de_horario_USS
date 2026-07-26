@@ -11,12 +11,18 @@ import { exportarPNG, exportarPDF } from '../lib/exportar'
 
 export default function ScheduleView({
   cursos, franjas, paquetes, onQuitar, onVerDetalle, onIrABuscar, onCambiarPaquete, onNotificar,
-  horarioActivo, onGuardarNuevo, onActualizarActivo,
+  horarioActivo, hayCambiosSinGuardar, onGuardarNuevo, onActualizarActivo, onNuevoHorario,
 }) {
   const [exportando, setExportando] = useState(false)
   const [claveActiva, setClaveActiva] = useState(null)
   const [topesAceptados, setTopesAceptados] = useState(() => new Set())
   const [nombreNuevo, setNombreNuevo] = useState('')
+  const [confirmandoNuevo, setConfirmandoNuevo] = useState(false)
+
+  const pedirNuevo = () => {
+    if (hayCambiosSinGuardar) setConfirmandoNuevo(true)
+    else onNuevoHorario()
+  }
 
   const eventos = useMemo(() => paquetes.flatMap((p) => p.eventos), [paquetes])
   const clavesOrdenadas = useMemo(() => paquetes.map((p) => p.clave), [paquetes])
@@ -171,19 +177,57 @@ export default function ScheduleView({
 
       <aside className="space-y-3">
         <div className="rounded-xl border border-gray-200 bg-white p-3 dark:border-gray-800 dark:bg-gray-900">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between gap-2">
             <h2 className="text-sm font-semibold">Ramos ({paquetes.length})</h2>
-            <button
-              type="button"
-              onClick={onIrABuscar}
-              className="text-xs font-medium text-purple-600 hover:underline dark:text-purple-400"
-            >
-              + Agregar
-            </button>
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={onIrABuscar}
+                className="text-xs font-medium text-purple-600 hover:underline dark:text-purple-400"
+              >
+                + Agregar
+              </button>
+              <span className="text-gray-300 dark:text-gray-700">|</span>
+              <button
+                type="button"
+                onClick={pedirNuevo}
+                className="text-xs font-medium text-gray-500 hover:underline dark:text-gray-400"
+                title="Vaciar el horario para empezar uno nuevo"
+              >
+                Nuevo
+              </button>
+            </div>
           </div>
-          <p className="mt-0.5 text-[11px] text-gray-400">
-            Haz clic en un ramo para ver sus otras secciones.
-          </p>
+
+          {confirmandoNuevo ? (
+            <div className="mt-2 rounded-lg border border-amber-300 bg-amber-50 px-2 py-1.5 dark:border-amber-800 dark:bg-amber-950/40">
+              <p className="text-[11px] text-amber-800 dark:text-amber-300">
+                {horarioActivo
+                  ? `Tienes cambios sin guardar en "${horarioActivo.nombre}". Si empiezas uno nuevo se pierden.`
+                  : 'Este horario no está guardado. Si empiezas uno nuevo se pierde.'}
+              </p>
+              <div className="mt-1.5 flex gap-1.5">
+                <button
+                  type="button"
+                  onClick={() => { setConfirmandoNuevo(false); onNuevoHorario() }}
+                  className="flex-1 rounded-md bg-amber-600 px-2 py-1 text-[11px] font-medium text-white hover:bg-amber-700"
+                >
+                  Empezar de nuevo
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setConfirmandoNuevo(false)}
+                  className="flex-1 rounded-md border border-amber-400 px-2 py-1 text-[11px] font-medium text-amber-800 hover:bg-amber-100 dark:text-amber-300 dark:hover:bg-amber-950"
+                >
+                  Cancelar
+                </button>
+              </div>
+            </div>
+          ) : (
+            <p className="mt-0.5 text-[11px] text-gray-400">
+              Haz clic en un ramo para ver sus otras secciones.
+            </p>
+          )}
 
           <ul className="mt-2 space-y-2">
             {paquetes.map((p) => {
