@@ -42,16 +42,18 @@ export default function AutoBuilder({ cursos, ramosSeleccionados, onAplicar, onN
       prev.includes(nombre) ? prev.filter((n) => n !== nombre) : [...prev, nombre])
   }
 
-  const armar = () => {
+  const armar = (forzar = false) => {
     if (elegidos.length === 0) return
-    const r = armarHorario(elegidos, cursos)
+    const r = armarHorario(elegidos, cursos, { forzar })
     setResultado(r)
     if (r.exito && r.topes === 0) {
       onNotificar(`Horario armado con ${r.paquetes.length} ramos y sin topes.`)
+    } else if (r.exito && r.forzado) {
+      onNotificar(`Horario armado con ${r.topes} tope(s). Revísalos y ajústalos a mano.`, 'aviso')
     } else if (r.exito) {
       onNotificar(`Horario armado con ${r.topes} tope(s) inevitables entre informática y servicio.`, 'aviso')
     } else {
-      onNotificar('No se pudo armar un horario con esos ramos.', 'error')
+      onNotificar('No se pudo armar un horario sin topes con esos ramos.', 'error')
     }
   }
 
@@ -127,7 +129,7 @@ export default function AutoBuilder({ cursos, ramosSeleccionados, onAplicar, onN
           <div className="mt-3 flex gap-2">
             <button
               type="button"
-              onClick={armar}
+              onClick={() => armar(false)}
               disabled={elegidos.length === 0}
               className="flex-1 rounded-lg bg-purple-600 px-3 py-2 text-sm font-medium text-white hover:bg-purple-700 disabled:opacity-40"
             >
@@ -154,11 +156,15 @@ export default function AutoBuilder({ cursos, ramosSeleccionados, onAplicar, onN
                 <p className={`mt-1 text-xs ${
                   resultado.topes === 0
                     ? 'text-emerald-600 dark:text-emerald-400'
-                    : 'text-amber-600 dark:text-amber-400'
+                    : resultado.forzado
+                      ? 'text-red-600 dark:text-red-400'
+                      : 'text-amber-600 dark:text-amber-400'
                 }`}>
                   {resultado.topes === 0
                     ? 'Combinación encontrada sin ningún tope.'
-                    : `Combinación con ${resultado.topes} tope(s), solo entre informática y ramos de servicio.`}
+                    : resultado.forzado
+                      ? `Horario forzado con ${resultado.topes} tope(s). Es la combinación con menos choques posibles: ábrelo y ajústalo a mano desde el panel de secciones.`
+                      : `Combinación con ${resultado.topes} tope(s), solo entre informática y ramos de servicio.`}
                 </p>
                 <ul className="mt-2 space-y-1">
                   {resultado.paquetes.map((p) => (
@@ -179,6 +185,7 @@ export default function AutoBuilder({ cursos, ramosSeleccionados, onAplicar, onN
             ) : (
               <div className="mt-1 space-y-2">
                 <p className="text-xs text-red-600 dark:text-red-400">{resultado.motivo}</p>
+
                 {resultado.incompatibles?.length > 0 && (
                   <ul className="space-y-1">
                     {resultado.incompatibles.map(([a, b], i) => (
@@ -188,9 +195,33 @@ export default function AutoBuilder({ cursos, ramosSeleccionados, onAplicar, onN
                     ))}
                   </ul>
                 )}
+
+                {resultado.grupoIncompatible?.length > 0 && (
+                  <div className="rounded-md bg-red-50 px-2 py-1.5 text-xs text-red-800 dark:bg-red-950/40 dark:text-red-300">
+                    <p>Estos {resultado.grupoIncompatible.length} ramos no se pueden tomar juntos:</p>
+                    <ul className="mt-1 list-disc pl-4">
+                      {resultado.grupoIncompatible.map((n) => <li key={n}><strong>{n}</strong></li>)}
+                    </ul>
+                    <p className="mt-1 opacity-80">
+                      Por pares sí encajan, pero los tres a la vez no. Basta con sacar uno.
+                    </p>
+                  </div>
+                )}
+
                 <p className="text-xs text-gray-500 dark:text-gray-400">
-                  Saca uno de los ramos en conflicto y vuelve a armar.
+                  Saca uno de los ramos en conflicto y vuelve a armar, o arma el horario igual
+                  y corrige los topes tú.
                 </p>
+
+                {resultado.sePuedeForzar && (
+                  <button
+                    type="button"
+                    onClick={() => armar(true)}
+                    className="w-full rounded-lg border border-amber-400 bg-amber-50 px-3 py-2 text-xs font-medium text-amber-800 hover:bg-amber-100 dark:border-amber-700 dark:bg-amber-950/40 dark:text-amber-300 dark:hover:bg-amber-950/70"
+                  >
+                    Armar de todas formas (con topes)
+                  </button>
+                )}
               </div>
             )}
 
