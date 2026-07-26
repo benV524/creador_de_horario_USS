@@ -172,8 +172,8 @@ export function dibujarHorario(paquetes, franjas, opciones = {}) {
   return canvas
 }
 
-export function exportarPNG(paquetes, franjas, nombreArchivo = 'mi-horario.png') {
-  const canvas = dibujarHorario(paquetes, franjas)
+export function exportarPNG(paquetes, franjas, nombreArchivo = 'mi-horario.png', titulo) {
+  const canvas = dibujarHorario(paquetes, franjas, titulo ? { titulo } : {})
   const enlace = document.createElement('a')
   enlace.download = nombreArchivo
   enlace.href = canvas.toDataURL('image/png')
@@ -191,8 +191,8 @@ async function cargarJsPDF() {
   }
 }
 
-export async function exportarPDF(paquetes, franjas, nombreArchivo = 'mi-horario.pdf') {
-  const canvas = dibujarHorario(paquetes, franjas)
+export async function exportarPDF(paquetes, franjas, nombreArchivo = 'mi-horario.pdf', titulo) {
+  const canvas = dibujarHorario(paquetes, franjas, titulo ? { titulo } : {})
   const jsPDF = await cargarJsPDF()
   const ancho = canvas.width / 2
   const alto = canvas.height / 2
