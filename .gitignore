@@ -15,6 +15,9 @@ dist-ssr
 # Vercel
 .vercel
 
+# Configuracion local de herramientas de desarrollo
+.claude
+
 # Los Excel institucionales traen nombres reales de profesores: no se publican.
 # La app los lee desde el navegador, no los necesita en el repositorio.
 *.xlsx
