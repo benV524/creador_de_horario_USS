@@ -12,8 +12,9 @@ dist
 dist-ssr
 *.local
 
-# Vercel
+# Vercel: metadatos del proyecto y el .env.local con el token que baja `vercel env pull`
 .vercel
+.env*
 
 # Configuracion local de herramientas de desarrollo
 .claude
