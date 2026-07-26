@@ -191,7 +191,16 @@ export function mejorPaqueteParaSeccion(nrc, cursosPorNrc, eventosExistentes) {
 
 const LIMITE_NODOS = 400000
 
-function buscarCombinacion(ramos, permitirTopes) {
+export const MODOS = {
+  /** No se acepta ningún choque. */
+  SIN_TOPES: 'sin-topes',
+  /** Solo se acepta el cruce entre un ramo de informática y uno de servicio. */
+  SOLO_CRUZADOS: 'solo-cruzados',
+  /** Se acepta cualquier choque, minimizando la cantidad. Siempre encuentra solución. */
+  CUALQUIERA: 'cualquiera',
+}
+
+function buscarCombinacion(ramos, modo) {
   let mejorSolucion = null
   let mejorTopes = Infinity
   let nodos = 0
@@ -201,7 +210,8 @@ function buscarCombinacion(ramos, permitirTopes) {
     for (const ev of paquete.eventos) {
       for (const previo of eventosAcum) {
         if (!seSuperponen(ev, previo)) continue
-        if (!permitirTopes || !topePermitido(ev, previo)) return null
+        if (modo === MODOS.SIN_TOPES) return null
+        if (modo === MODOS.SOLO_CRUZADOS && !topePermitido(ev, previo)) return null
         topes++
       }
     }
@@ -231,11 +241,27 @@ function buscarCombinacion(ramos, permitirTopes) {
 }
 
 /**
+ * Reduce el conjunto a un grupo irreducible que sigue sin tener solución: quita ramos de
+ * a uno y conserva la quita solo si el resto continúa siendo infactible. Con n búsquedas
+ * en vez de probar todos los subconjuntos, deja el grupo mínimo que hay que romper.
+ */
+function grupoMinimoInfactible(ordenados) {
+  let actual = [...ordenados]
+  for (const ramo of [...actual]) {
+    if (actual.length <= 2) break
+    const candidato = actual.filter((r) => r !== ramo)
+    if (!buscarCombinacion(candidato, MODOS.SOLO_CRUZADOS)) actual = candidato
+  }
+  return actual.map((r) => r.nombre)
+}
+
+/**
  * Arma un horario para la lista de ramos pedida.
  * Primero busca una combinación sin ningún tope; si no existe, acepta topes únicamente
- * entre un ramo de informática y uno de servicio.
+ * entre un ramo de informática y uno de servicio. Con `forzar` se permite cualquier
+ * choque, minimizando la cantidad, para que el usuario lo corrija a mano.
  */
-export function armarHorario(nombresRamos, cursos) {
+export function armarHorario(nombresRamos, cursos, { forzar = false } = {}) {
   const paquetesPorRamo = construirPaquetesPorRamo(cursos)
 
   const ramos = nombresRamos.map((nombre) => ({
@@ -249,32 +275,43 @@ export function armarHorario(nombresRamos, cursos) {
   // Resolver primero los ramos más restringidos reduce muchísimo el espacio de búsqueda.
   const ordenados = [...viables].sort((a, b) => a.paquetes.length - b.paquetes.length)
 
-  let resultado = buscarCombinacion(ordenados, false)
-  let conTopes = false
+  let resultado = buscarCombinacion(ordenados, MODOS.SIN_TOPES)
+  let modoUsado = MODOS.SIN_TOPES
   if (!resultado) {
-    resultado = buscarCombinacion(ordenados, true)
-    conTopes = true
+    resultado = buscarCombinacion(ordenados, MODOS.SOLO_CRUZADOS)
+    modoUsado = MODOS.SOLO_CRUZADOS
+  }
+  if (!resultado && forzar) {
+    resultado = buscarCombinacion(ordenados, MODOS.CUALQUIERA)
+    modoUsado = MODOS.CUALQUIERA
   }
 
   if (!resultado) {
-    // Identificar qué pares son irreconciliables ayuda mucho más que un error genérico.
+    // Nombrar a los culpables ayuda mucho más que un error genérico.
     const incompatibles = []
     for (let i = 0; i < ordenados.length; i++) {
       for (let j = i + 1; j < ordenados.length; j++) {
-        if (!buscarCombinacion([ordenados[i], ordenados[j]], true)) {
+        if (!buscarCombinacion([ordenados[i], ordenados[j]], MODOS.SOLO_CRUZADOS)) {
           incompatibles.push([ordenados[i].nombre, ordenados[j].nombre])
         }
       }
     }
+    // Sin pares culpables el conflicto es de tres o más ramos a la vez.
+    const grupoIncompatible = incompatibles.length === 0 && ordenados.length > 2
+      ? grupoMinimoInfactible(ordenados)
+      : []
+
     return {
       exito: false,
       paquetes: [],
       topes: 0,
       sinOpciones,
       incompatibles,
+      grupoIncompatible,
+      sePuedeForzar: ordenados.length > 0,
       motivo: incompatibles.length > 0
         ? 'Hay ramos que chocan en todas sus secciones y son del mismo tipo, así que no se pueden tomar juntos.'
-        : 'No existe combinación posible con todos estos ramos a la vez, aunque por pares sí encajan.',
+        : 'No existe combinación sin topes prohibidos con todos estos ramos a la vez.',
     }
   }
 
@@ -282,9 +319,11 @@ export function armarHorario(nombresRamos, cursos) {
     exito: true,
     paquetes: resultado.paquetes,
     topes: resultado.topes,
-    conTopes: conTopes && resultado.topes > 0,
+    conTopes: modoUsado !== MODOS.SIN_TOPES && resultado.topes > 0,
+    forzado: modoUsado === MODOS.CUALQUIERA,
     sinOpciones,
     incompatibles: [],
+    grupoIncompatible: [],
     motivo: '',
   }
 }
