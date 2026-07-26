@@ -11,10 +11,12 @@ import { exportarPNG, exportarPDF } from '../lib/exportar'
 
 export default function ScheduleView({
   cursos, franjas, paquetes, onQuitar, onVerDetalle, onIrABuscar, onCambiarPaquete, onNotificar,
+  horarioActivo, onGuardarNuevo, onActualizarActivo,
 }) {
   const [exportando, setExportando] = useState(false)
   const [claveActiva, setClaveActiva] = useState(null)
   const [topesAceptados, setTopesAceptados] = useState(() => new Set())
+  const [nombreNuevo, setNombreNuevo] = useState('')
 
   const eventos = useMemo(() => paquetes.flatMap((p) => p.eventos), [paquetes])
   const clavesOrdenadas = useMemo(() => paquetes.map((p) => p.clave), [paquetes])
@@ -248,6 +250,48 @@ export default function ScheduleView({
               )
             })}
           </ul>
+        </div>
+
+        <div className="rounded-xl border border-gray-200 bg-white p-3 dark:border-gray-800 dark:bg-gray-900">
+          <h2 className="text-sm font-semibold">Guardar horario</h2>
+          {horarioActivo && (
+            <div className="mt-2 rounded-lg bg-purple-50 px-2 py-1.5 dark:bg-purple-950/30">
+              <p className="truncate text-[11px] text-purple-800 dark:text-purple-300">
+                Abierto: <strong>{horarioActivo.nombre}</strong>
+              </p>
+              <button
+                type="button"
+                onClick={onActualizarActivo}
+                className="mt-1 w-full rounded-md bg-purple-600 px-2 py-1 text-xs font-medium text-white hover:bg-purple-700"
+              >
+                Guardar cambios
+              </button>
+            </div>
+          )}
+          <form
+            className="mt-2 flex gap-1.5"
+            onSubmit={(e) => {
+              e.preventDefault()
+              const limpio = nombreNuevo.trim()
+              if (!limpio) return
+              onGuardarNuevo(limpio)
+              setNombreNuevo('')
+            }}
+          >
+            <input
+              value={nombreNuevo}
+              onChange={(e) => setNombreNuevo(e.target.value)}
+              placeholder={horarioActivo ? 'Guardar como copia…' : 'Nombre del horario…'}
+              className="min-w-0 flex-1 rounded-lg border border-gray-300 px-2 py-1.5 text-xs dark:border-gray-700 dark:bg-gray-950"
+            />
+            <button
+              type="submit"
+              disabled={!nombreNuevo.trim()}
+              className="shrink-0 rounded-lg bg-gray-800 px-3 py-1.5 text-xs font-medium text-white hover:bg-gray-700 disabled:opacity-40 dark:bg-gray-700"
+            >
+              Guardar
+            </button>
+          </form>
         </div>
 
         <div className="rounded-xl border border-gray-200 bg-white p-3 dark:border-gray-800 dark:bg-gray-900">

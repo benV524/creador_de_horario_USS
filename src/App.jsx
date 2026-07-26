@@ -1,9 +1,10 @@
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import FileUpload from './components/FileUpload'
 import CourseSearch from './components/CourseSearch'
 import CourseDetail from './components/CourseDetail'
 import ScheduleView from './components/ScheduleView'
 import AutoBuilder from './components/AutoBuilder'
+import SavedSchedules from './components/SavedSchedules'
 import Avisos from './components/Avisos'
 import { SpeedInsights } from '@vercel/speed-insights/react'
 import {
@@ -11,11 +12,19 @@ import {
   construirPaqueteIndependiente,
   describirPaquete,
 } from './lib/armador'
+import {
+  leerHorarios,
+  escribirHorarios,
+  crearHorario,
+  serializarPaquetes,
+  rehidratar,
+} from './lib/almacenamiento'
 
 const VISTAS = [
   { id: 'horario', etiqueta: 'Mi horario' },
   { id: 'buscar', etiqueta: 'Buscar ramos' },
   { id: 'auto', etiqueta: 'Armado automático' },
+  { id: 'guardados', etiqueta: 'Guardados' },
 ]
 
 function App() {
@@ -24,6 +33,8 @@ function App() {
   const [paquetes, setPaquetes] = useState([])
   const [nrcDetalle, setNrcDetalle] = useState(null)
   const [avisos, setAvisos] = useState([])
+  const [horariosGuardados, setHorariosGuardados] = useState(() => leerHorarios())
+  const [horarioActivoId, setHorarioActivoId] = useState(null)
 
   const cursosPorNrc = useMemo(() => {
     const mapa = new Map()
@@ -121,6 +132,83 @@ function App() {
     notificar(`${nuevo.ramo}: ahora tomas ${describirPaquete(nuevo)}.`)
   }, [notificar])
 
+  const horarioActivo = useMemo(
+    () => horariosGuardados.find((h) => h.id === horarioActivoId) ?? null,
+    [horariosGuardados, horarioActivoId],
+  )
+
+  /** Toda escritura pasa por aquí para mantener estado y localStorage en sincronía. */
+  const persistir = useCallback((nuevaLista, mensajeExito) => {
+    const resultado = escribirHorarios(nuevaLista)
+    if (!resultado.ok) {
+      notificar(resultado.error, 'error')
+      return false
+    }
+    setHorariosGuardados(nuevaLista)
+    if (mensajeExito) notificar(mensajeExito)
+    return true
+  }, [notificar])
+
+  const guardarNuevo = useCallback((nombre) => {
+    if (paquetes.length === 0) {
+      notificar('Tu horario está vacío: agrega ramos antes de guardarlo.', 'aviso')
+      return
+    }
+    const horario = crearHorario(nombre, paquetes)
+    if (persistir([horario, ...horariosGuardados], `Horario "${nombre}" guardado.`)) {
+      setHorarioActivoId(horario.id)
+    }
+  }, [paquetes, horariosGuardados, persistir, notificar])
+
+  const actualizarActivo = useCallback(() => {
+    if (!horarioActivo) return
+    const actualizado = {
+      ...horarioActivo,
+      entradas: serializarPaquetes(paquetes),
+      actualizadoEn: Date.now(),
+    }
+    persistir(
+      horariosGuardados.map((h) => (h.id === actualizado.id ? actualizado : h)),
+      `Cambios guardados en "${actualizado.nombre}".`,
+    )
+  }, [horarioActivo, paquetes, horariosGuardados, persistir])
+
+  const abrirGuardado = useCallback((guardado) => {
+    const { paquetes: recuperados, faltantes } = rehidratar(guardado, cursosPorNrc)
+    setPaquetes(recuperados)
+    setHorarioActivoId(guardado.id)
+    setVista('horario')
+    if (faltantes.length > 0) {
+      notificar(
+        `"${guardado.nombre}" se abrió sin ${faltantes.length} sección(es): los NRC ${faltantes.join(', ')} no están en el Excel cargado.`,
+        'aviso',
+      )
+    } else {
+      notificar(`Horario "${guardado.nombre}" abierto.`)
+    }
+  }, [cursosPorNrc, notificar])
+
+  const eliminarGuardado = useCallback((guardado) => {
+    if (persistir(
+      horariosGuardados.filter((h) => h.id !== guardado.id),
+      `Horario "${guardado.nombre}" eliminado.`,
+    )) {
+      if (horarioActivoId === guardado.id) setHorarioActivoId(null)
+    }
+  }, [horariosGuardados, horarioActivoId, persistir])
+
+  const renombrarGuardado = useCallback((id, nombre) => {
+    persistir(
+      horariosGuardados.map((h) => (h.id === id ? { ...h, nombre, actualizadoEn: Date.now() } : h)),
+      `Renombrado a "${nombre}".`,
+    )
+  }, [horariosGuardados, persistir])
+
+  // Vaciar el horario a mano lo desliga del guardado, para no sobrescribirlo sin querer.
+  useEffect(() => {
+    if (paquetes.length === 0) setHorarioActivoId(null)
+  }, [paquetes.length])
+
   const cursoDetalle = nrcDetalle ? cursosPorNrc.get(nrcDetalle) : null
 
   return (
@@ -156,6 +244,12 @@ function App() {
         {!datos ? (
           <div className="mx-auto max-w-2xl pt-10">
             <FileUpload onCargado={setDatos} />
+            {horariosGuardados.length > 0 && (
+              <p className="mt-3 text-center text-xs text-gray-500 dark:text-gray-400">
+                Tienes {horariosGuardados.length} horario{horariosGuardados.length === 1 ? '' : 's'} guardado
+                {horariosGuardados.length === 1 ? '' : 's'}. Sube el Excel para abrirlos.
+              </p>
+            )}
           </div>
         ) : (
           <>
@@ -183,6 +277,11 @@ function App() {
                       {paquetes.length}
                     </span>
                   )}
+                  {v.id === 'guardados' && horariosGuardados.length > 0 && (
+                    <span className={`ml-1.5 ${vista === v.id ? 'text-purple-200' : 'text-gray-400'}`}>
+                      {horariosGuardados.length}
+                    </span>
+                  )}
                 </button>
               ))}
             </nav>
@@ -197,6 +296,9 @@ function App() {
                 onIrABuscar={() => setVista('buscar')}
                 onCambiarPaquete={cambiarPaquete}
                 onNotificar={notificar}
+                horarioActivo={horarioActivo}
+                onGuardarNuevo={guardarNuevo}
+                onActualizarActivo={actualizarActivo}
               />
             )}
 
@@ -217,6 +319,19 @@ function App() {
                 cursos={datos.cursos}
                 ramosSeleccionados={ramosSeleccionados}
                 onAplicar={aplicarSolucion}
+                onNotificar={notificar}
+              />
+            )}
+
+            {vista === 'guardados' && (
+              <SavedSchedules
+                horarios={horariosGuardados}
+                cursosPorNrc={cursosPorNrc}
+                franjas={datos.franjas}
+                activoId={horarioActivoId}
+                onAbrir={abrirGuardado}
+                onEliminar={eliminarGuardado}
+                onRenombrar={renombrarGuardado}
                 onNotificar={notificar}
               />
             )}
