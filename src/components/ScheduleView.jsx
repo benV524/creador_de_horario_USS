@@ -42,7 +42,6 @@ export default function ScheduleView({
 
   const paquetesPorRamo = useMemo(() => construirPaquetesPorRamo(cursos), [cursos])
 
-  // Si la entrada abierta se quita del horario, cerrar el panel.
   useEffect(() => {
     if (claveActiva && !paquetes.some((p) => p.clave === claveActiva)) setClaveActiva(null)
   }, [paquetes, claveActiva])
@@ -55,7 +54,7 @@ export default function ScheduleView({
       if (!mapa.has(clave)) {
         mapa.set(clave, {
           clave,
-          etiqueta: [a.ramo, b.ramo].sort().join(' ⇄ '),
+          etiqueta: [a.ramo, b.ramo].sort().join(' y '),
           permitido,
           aceptado,
           bloques: [],
@@ -83,22 +82,26 @@ export default function ScheduleView({
 
   if (paquetes.length === 0) {
     return (
-      <div className="rounded-xl border border-dashed border-gray-300 bg-white py-16 text-center dark:border-gray-700 dark:bg-gray-900">
-        <p className="text-sm text-gray-500 dark:text-gray-400">Tu horario está vacío.</p>
-        <button
-          type="button"
-          onClick={onIrABuscar}
-          className="mt-3 rounded-lg bg-purple-600 px-4 py-2 text-sm font-medium text-white hover:bg-purple-700"
-        >
-          Buscar ramos
-        </button>
+      <div className="rounded border border-dashed border-linea bg-hoja py-20 text-center">
+        <p className="text-[15px] font-semibold text-tinta">Tu horario está vacío</p>
+        <p className="mt-1 text-[13px] text-apagado">
+          Agrega ramos uno a uno, o deja que la app pruebe las combinaciones por ti.
+        </p>
+        <div className="mt-5 flex justify-center gap-2">
+          <button
+            type="button"
+            onClick={onIrABuscar}
+            className="rounded bg-verde px-4 py-2 text-[13px] font-medium text-white transition-colors hover:bg-verde-fuerte"
+          >
+            Buscar ramos
+          </button>
+        </div>
       </div>
     )
   }
 
   const paqueteActivo = paquetes.find((p) => p.clave === claveActiva)
 
-  // Para una sección suelta las alternativas son las demás secciones del ramo, también sueltas.
   const alternativasDelActivo = !paqueteActivo
     ? []
     : paqueteActivo.esIndependiente
@@ -111,8 +114,8 @@ export default function ScheduleView({
     <div
       className={`grid gap-5 ${
         claveActiva
-          ? 'xl:grid-cols-[minmax(0,1fr)_360px] 2xl:grid-cols-[minmax(0,1fr)_360px_420px]'
-          : 'xl:grid-cols-[minmax(0,1fr)_380px]'
+          ? 'xl:grid-cols-[minmax(0,1fr)_340px] 2xl:grid-cols-[minmax(0,1fr)_340px_400px]'
+          : 'xl:grid-cols-[minmax(0,1fr)_360px]'
       }`}
     >
       <div>
@@ -121,24 +124,25 @@ export default function ScheduleView({
             {topesPendientes.map((c) => (
               <div
                 key={c.clave}
-                className={`flex flex-wrap items-center gap-x-3 gap-y-2 rounded-lg border px-3 py-2 text-sm ${
+                className={`flex flex-wrap items-center gap-x-3 gap-y-2 rounded border-l-2 px-3 py-2 text-[13px] ${
                   c.permitido
-                    ? 'border-amber-300 bg-amber-50 text-amber-800 dark:border-amber-800 dark:bg-amber-950/40 dark:text-amber-300'
-                    : 'border-red-300 bg-red-50 text-red-800 dark:border-red-800 dark:bg-red-950/40 dark:text-red-300'
+                    ? 'border-tolerado bg-tolerado-suave text-tolerado'
+                    : 'border-tope bg-tope-suave text-tope'
                 }`}
               >
                 <span className="flex-1">
-                  <strong>Tope:</strong> {c.etiqueta} ({[...new Set(c.bloques)].join(', ')}).
+                  <strong className="font-semibold">{c.etiqueta}</strong> se pisan{' '}
+                  <span className="tabular">{[...new Set(c.bloques)].join(', ')}</span>.
                   {c.permitido
                     ? ' Es un cruce entre informática y un ramo de servicio.'
-                    : ' Son del mismo tipo, así que este tope no debería ocurrir.'}
+                    : ' Son del mismo tipo, así que este cruce no debería ocurrir.'}
                 </span>
                 <button
                   type="button"
                   onClick={() => alternarTope(c.clave)}
-                  className="shrink-0 rounded-md border border-current px-2.5 py-1 text-xs font-medium hover:bg-black/5 dark:hover:bg-white/10"
+                  className="shrink-0 rounded border border-current px-2.5 py-1 text-[12px] font-medium transition-colors hover:bg-black/5"
                 >
-                  Mantener así
+                  Dejarlo así
                 </button>
               </div>
             ))}
@@ -150,15 +154,16 @@ export default function ScheduleView({
             {topesResueltos.map((c) => (
               <div
                 key={c.clave}
-                className="flex flex-wrap items-center gap-x-3 gap-y-1 rounded-lg border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs text-slate-600 dark:border-gray-800 dark:bg-gray-900 dark:text-gray-400"
+                className="flex flex-wrap items-center gap-x-3 gap-y-1 rounded border border-linea bg-hoja px-3 py-1.5 text-[12px] text-apagado"
               >
                 <span className="flex-1">
-                  Tope aceptado: {c.etiqueta} ({[...new Set(c.bloques)].join(', ')}).
+                  Cruce aceptado entre {c.etiqueta} (
+                  <span className="tabular">{[...new Set(c.bloques)].join(', ')}</span>).
                 </span>
                 <button
                   type="button"
                   onClick={() => alternarTope(c.clave)}
-                  className="shrink-0 font-medium underline hover:no-underline"
+                  className="shrink-0 font-medium text-verde hover:underline"
                 >
                   Deshacer
                 </button>
@@ -175,61 +180,56 @@ export default function ScheduleView({
         />
       </div>
 
-      <aside className="space-y-3">
-        <div className="rounded-xl border border-gray-200 bg-white p-3 dark:border-gray-800 dark:bg-gray-900">
-          <div className="flex items-center justify-between gap-2">
-            <h2 className="text-sm font-semibold">Ramos ({paquetes.length})</h2>
-            <div className="flex items-center gap-2">
+      <aside className="space-y-4">
+        <section className="rounded border border-linea bg-hoja">
+          <div className="flex items-center justify-between gap-2 border-b border-linea px-3 py-2.5">
+            <h2 className="rotulo">Ramos ({paquetes.length})</h2>
+            <div className="flex items-center gap-2 text-[12px] font-medium">
               <button
                 type="button"
                 onClick={onIrABuscar}
-                className="text-xs font-medium text-purple-600 hover:underline dark:text-purple-400"
+                className="text-verde hover:underline"
               >
-                + Agregar
+                Agregar
               </button>
-              <span className="text-gray-300 dark:text-gray-700">|</span>
+              <span className="text-linea">·</span>
               <button
                 type="button"
                 onClick={pedirNuevo}
-                className="text-xs font-medium text-gray-500 hover:underline dark:text-gray-400"
-                title="Vaciar el horario para empezar uno nuevo"
+                className="text-apagado hover:text-tinta hover:underline"
               >
-                Nuevo
+                Empezar de nuevo
               </button>
             </div>
           </div>
 
-          {confirmandoNuevo ? (
-            <div className="mt-2 rounded-lg border border-amber-300 bg-amber-50 px-2 py-1.5 dark:border-amber-800 dark:bg-amber-950/40">
-              <p className="text-[11px] text-amber-800 dark:text-amber-300">
+          {confirmandoNuevo && (
+            <div className="border-b border-linea bg-tolerado-suave px-3 py-2.5">
+              <p className="text-[12px] text-tolerado">
                 {horarioActivo
-                  ? `Tienes cambios sin guardar en "${horarioActivo.nombre}". Si empiezas uno nuevo se pierden.`
-                  : 'Este horario no está guardado. Si empiezas uno nuevo se pierde.'}
+                  ? `"${horarioActivo.nombre}" tiene cambios sin guardar. Si empiezas de nuevo se pierden.`
+                  : 'Este horario no está guardado. Si empiezas de nuevo se pierde.'}
               </p>
-              <div className="mt-1.5 flex gap-1.5">
+              <div className="mt-2 flex gap-2">
                 <button
                   type="button"
                   onClick={() => { setConfirmandoNuevo(false); onNuevoHorario() }}
-                  className="flex-1 rounded-md bg-amber-600 px-2 py-1 text-[11px] font-medium text-white hover:bg-amber-700"
+                  className="rounded bg-tolerado px-2.5 py-1 text-[12px] font-medium text-white hover:brightness-110"
                 >
                   Empezar de nuevo
                 </button>
                 <button
                   type="button"
                   onClick={() => setConfirmandoNuevo(false)}
-                  className="flex-1 rounded-md border border-amber-400 px-2 py-1 text-[11px] font-medium text-amber-800 hover:bg-amber-100 dark:text-amber-300 dark:hover:bg-amber-950"
+                  className="rounded border border-tolerado px-2.5 py-1 text-[12px] font-medium text-tolerado hover:bg-black/5"
                 >
                   Cancelar
                 </button>
               </div>
             </div>
-          ) : (
-            <p className="mt-0.5 text-[11px] text-gray-400">
-              Haz clic en un ramo para ver sus otras secciones.
-            </p>
           )}
 
-          <ul className="mt-2 space-y-2">
+          <ul className="divide-y divide-linea-suave">
             {paquetes.map((p) => {
               const activo = p.clave === claveActiva
               const alternativas = p.esIndependiente
@@ -238,15 +238,11 @@ export default function ScheduleView({
               return (
                 <li
                   key={p.clave}
-                  className={`rounded-lg border p-2 transition-colors ${
-                    activo
-                      ? 'border-purple-400 bg-purple-50 dark:border-purple-600 dark:bg-purple-950/30'
-                      : 'border-gray-100 dark:border-gray-800'
-                  }`}
+                  className={`px-3 py-2.5 transition-colors ${activo ? 'bg-verde-suave' : ''}`}
                 >
-                  <div className="flex items-start gap-2">
+                  <div className="flex items-start gap-2.5">
                     <span
-                      className="mt-1 h-3 w-3 shrink-0 rounded-sm"
+                      className="mt-1 h-3 w-1 shrink-0 rounded-full"
                       style={{ background: colorParaClave(p.clave, clavesOrdenadas) }}
                     />
                     <button
@@ -254,37 +250,37 @@ export default function ScheduleView({
                       onClick={() => setClaveActiva(activo ? null : p.clave)}
                       className="min-w-0 flex-1 text-left"
                     >
-                      <p className="truncate text-xs font-semibold" title={p.ramo}>{p.ramo}</p>
-                      <p className="text-[11px] text-gray-500 dark:text-gray-400">
+                      <p className="truncate text-[13px] font-semibold leading-snug" title={p.ramo}>
+                        {p.ramo}
+                      </p>
+                      <p className="mt-0.5 text-[12px] text-apagado">
                         {describirPaquete(p)}
                         {p.esIndependiente && (
-                          <span className="ml-1.5 rounded bg-slate-200 px-1 py-0.5 text-[9px] font-medium uppercase tracking-wide text-slate-600 dark:bg-gray-700 dark:text-gray-300">
-                            independiente
-                          </span>
+                          <span className="rotulo ml-1.5 text-[9px] text-tenue">independiente</span>
                         )}
                       </p>
                       {alternativas > 1 && (
-                        <p className="mt-0.5 text-[10px] text-purple-600 dark:text-purple-400">
-                          {alternativas} {p.esIndependiente ? 'secciones' : 'combinaciones'} disponibles
+                        <p className="mt-0.5 text-[11px] text-verde">
+                          {alternativas} {p.esIndependiente ? 'secciones' : 'combinaciones'} para elegir
                         </p>
                       )}
                     </button>
                     <button
                       type="button"
                       onClick={() => onQuitar(p.clave)}
-                      className="shrink-0 text-xs text-gray-400 hover:text-red-500"
+                      className="shrink-0 text-[13px] leading-none text-tenue transition-colors hover:text-tope"
                       title="Quitar del horario"
                     >
                       ✕
                     </button>
                   </div>
-                  <div className="mt-1 flex flex-wrap gap-1 pl-5">
+                  <div className="mt-1.5 flex flex-wrap gap-1 pl-[22px]">
                     {p.secciones.map((s) => (
                       <button
                         key={s.nrc}
                         type="button"
                         onClick={() => onVerDetalle(s.nrc)}
-                        className="rounded bg-gray-100 px-1.5 py-0.5 font-mono text-[10px] text-gray-600 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300"
+                        className="tabular rounded-[3px] border border-linea px-1.5 py-0.5 text-[10px] text-apagado transition-colors hover:border-verde-borde hover:bg-verde-suave hover:text-verde"
                       >
                         {s.nrc}
                       </button>
@@ -294,58 +290,60 @@ export default function ScheduleView({
               )
             })}
           </ul>
-        </div>
+        </section>
 
-        <div className="rounded-xl border border-gray-200 bg-white p-3 dark:border-gray-800 dark:bg-gray-900">
-          <h2 className="text-sm font-semibold">Guardar horario</h2>
-          {horarioActivo && (
-            <div className="mt-2 rounded-lg bg-purple-50 px-2 py-1.5 dark:bg-purple-950/30">
-              <p className="truncate text-[11px] text-purple-800 dark:text-purple-300">
-                Abierto: <strong>{horarioActivo.nombre}</strong>
-              </p>
-              <button
-                type="button"
-                onClick={onActualizarActivo}
-                className="mt-1 w-full rounded-md bg-purple-600 px-2 py-1 text-xs font-medium text-white hover:bg-purple-700"
-              >
-                Guardar cambios
-              </button>
-            </div>
-          )}
-          <form
-            className="mt-2 flex gap-1.5"
-            onSubmit={(e) => {
-              e.preventDefault()
-              const limpio = nombreNuevo.trim()
-              if (!limpio) return
-              onGuardarNuevo(limpio)
-              setNombreNuevo('')
-            }}
-          >
-            <input
-              value={nombreNuevo}
-              onChange={(e) => setNombreNuevo(e.target.value)}
-              placeholder={horarioActivo ? 'Guardar como copia…' : 'Nombre del horario…'}
-              className="min-w-0 flex-1 rounded-lg border border-gray-300 px-2 py-1.5 text-xs dark:border-gray-700 dark:bg-gray-950"
-            />
-            <button
-              type="submit"
-              disabled={!nombreNuevo.trim()}
-              className="shrink-0 rounded-lg bg-gray-800 px-3 py-1.5 text-xs font-medium text-white hover:bg-gray-700 disabled:opacity-40 dark:bg-gray-700"
+        <section className="rounded border border-linea bg-hoja">
+          <h2 className="rotulo border-b border-linea px-3 py-2.5">Guardar</h2>
+          <div className="p-3">
+            {horarioActivo && (
+              <div className="mb-2 rounded border border-verde-borde bg-verde-suave px-2.5 py-2">
+                <p className="truncate text-[12px] text-verde">
+                  Abierto: <strong className="font-semibold">{horarioActivo.nombre}</strong>
+                </p>
+                <button
+                  type="button"
+                  onClick={onActualizarActivo}
+                  className="mt-1.5 w-full rounded bg-verde px-2 py-1.5 text-[12px] font-medium text-white transition-colors hover:bg-verde-fuerte"
+                >
+                  Guardar cambios
+                </button>
+              </div>
+            )}
+            <form
+              className="flex gap-1.5"
+              onSubmit={(e) => {
+                e.preventDefault()
+                const limpio = nombreNuevo.trim()
+                if (!limpio) return
+                onGuardarNuevo(limpio)
+                setNombreNuevo('')
+              }}
             >
-              Guardar
-            </button>
-          </form>
-        </div>
+              <input
+                value={nombreNuevo}
+                onChange={(e) => setNombreNuevo(e.target.value)}
+                placeholder={horarioActivo ? 'Guardar como copia…' : 'Nombre del horario…'}
+                className="min-w-0 flex-1 rounded border border-linea bg-hoja px-2 py-1.5 text-[12px] placeholder:text-tenue focus:border-verde focus:outline-none"
+              />
+              <button
+                type="submit"
+                disabled={!nombreNuevo.trim()}
+                className="shrink-0 rounded border border-linea px-3 py-1.5 text-[12px] font-medium text-tinta transition-colors hover:border-verde-borde hover:bg-verde-suave hover:text-verde disabled:opacity-40 disabled:hover:border-linea disabled:hover:bg-transparent disabled:hover:text-tinta"
+              >
+                Guardar
+              </button>
+            </form>
+          </div>
+        </section>
 
-        <div className="rounded-xl border border-gray-200 bg-white p-3 dark:border-gray-800 dark:bg-gray-900">
-          <h2 className="text-sm font-semibold">Exportar</h2>
-          <div className="mt-2 flex gap-2">
+        <section className="rounded border border-linea bg-hoja">
+          <h2 className="rotulo border-b border-linea px-3 py-2.5">Descargar</h2>
+          <div className="flex gap-2 p-3">
             <button
               type="button"
               disabled={exportando}
               onClick={() => exportar('png')}
-              className="flex-1 rounded-lg bg-gray-800 px-3 py-2 text-sm font-medium text-white hover:bg-gray-700 disabled:opacity-40 dark:bg-gray-700"
+              className="flex-1 rounded border border-linea px-3 py-2 text-[12px] font-medium transition-colors hover:border-verde-borde hover:bg-verde-suave hover:text-verde disabled:opacity-40"
             >
               Imagen
             </button>
@@ -353,12 +351,12 @@ export default function ScheduleView({
               type="button"
               disabled={exportando}
               onClick={() => exportar('pdf')}
-              className="flex-1 rounded-lg bg-purple-600 px-3 py-2 text-sm font-medium text-white hover:bg-purple-700 disabled:opacity-40"
+              className="flex-1 rounded border border-linea px-3 py-2 text-[12px] font-medium transition-colors hover:border-verde-borde hover:bg-verde-suave hover:text-verde disabled:opacity-40"
             >
               PDF
             </button>
           </div>
-        </div>
+        </section>
       </aside>
 
       {paqueteActivo && (

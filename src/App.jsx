@@ -228,26 +228,29 @@ function App() {
   const cursoDetalle = nrcDetalle ? cursosPorNrc.get(nrcDetalle) : null
 
   return (
-    <div className="min-h-screen bg-gray-50 text-gray-900 dark:bg-gray-950 dark:text-gray-100">
+    <div className="min-h-screen bg-papel text-tinta">
       <Avisos avisos={avisos} />
 
-      <header className="border-b border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900">
-        <div className="mx-auto flex max-w-[1760px] flex-wrap items-center justify-between gap-3 px-4 py-3">
-          <div>
-            <h1 className="text-lg font-bold tracking-tight">Horario USS</h1>
-            <p className="text-xs text-gray-500 dark:text-gray-400">
-              Consulta la oferta y arma tu horario sin topes.
+      <header className="border-b border-linea bg-hoja">
+        <div className="mx-auto flex max-w-[1760px] flex-wrap items-center justify-between gap-4 px-5 py-4">
+          <div className="flex items-baseline gap-3">
+            <h1 className="text-[19px] font-bold leading-none tracking-[-0.02em]">
+              Horario <span className="text-verde">USS</span>
+            </h1>
+            <p className="hidden text-[13px] text-apagado sm:block">
+              Arma tu horario sin topes.
             </p>
           </div>
           {datos && (
-            <div className="flex items-center gap-3 text-xs text-gray-500 dark:text-gray-400">
-              <span className="hidden sm:inline">
-                {datos.cursos.length} secciones · {datos.nombreArchivo}
+            <div className="flex items-center gap-3 text-[13px]">
+              <span className="hidden text-apagado md:inline">
+                <span className="tabular">{datos.cursos.length}</span> secciones ·{' '}
+                {datos.nombreArchivo}
               </span>
               <button
                 type="button"
                 onClick={() => { setDatos(null); setPaquetes([]) }}
-                className="rounded-md border border-gray-300 px-2.5 py-1 font-medium hover:bg-gray-100 dark:border-gray-700 dark:hover:bg-gray-800"
+                className="rounded border border-linea px-2.5 py-1 font-medium text-apagado transition-colors hover:border-verde-borde hover:bg-verde-suave hover:text-verde"
               >
                 Cargar otro Excel
               </button>
@@ -256,13 +259,14 @@ function App() {
         </div>
       </header>
 
-      <main className="mx-auto max-w-[1760px] px-4 py-6">
+      <main className="mx-auto max-w-[1760px] px-5 py-6">
         {!datos ? (
-          <div className="mx-auto max-w-2xl pt-10">
+          <div className="mx-auto max-w-xl pt-16">
             <FileUpload onCargado={setDatos} />
             {horariosGuardados.length > 0 && (
-              <p className="mt-3 text-center text-xs text-gray-500 dark:text-gray-400">
-                Tienes {horariosGuardados.length} horario{horariosGuardados.length === 1 ? '' : 's'} guardado
+              <p className="mt-4 text-center text-[13px] text-apagado">
+                Tienes <span className="tabular font-medium text-tinta">{horariosGuardados.length}</span>{' '}
+                horario{horariosGuardados.length === 1 ? '' : 's'} guardado
                 {horariosGuardados.length === 1 ? '' : 's'}. Sube el Excel para abrirlos.
               </p>
             )}
@@ -270,36 +274,38 @@ function App() {
         ) : (
           <>
             {datos.warnings.length > 0 && (
-              <div className="mb-4 rounded-lg border border-amber-300 bg-amber-50 px-3 py-2 text-sm text-amber-800 dark:border-amber-800 dark:bg-amber-950/40 dark:text-amber-300">
+              <div className="mb-4 rounded border-l-2 border-tolerado bg-tolerado-suave px-3 py-2 text-[13px] text-tolerado">
                 {datos.warnings.map((w, i) => <p key={i}>{w}</p>)}
               </div>
             )}
 
-            <nav className="mb-5 inline-flex rounded-lg border border-gray-200 bg-white p-1 dark:border-gray-800 dark:bg-gray-900">
-              {VISTAS.map((v) => (
-                <button
-                  key={v.id}
-                  type="button"
-                  onClick={() => setVista(v.id)}
-                  className={`rounded-md px-4 py-1.5 text-sm font-medium transition-colors ${
-                    vista === v.id
-                      ? 'bg-purple-600 text-white'
-                      : 'text-gray-600 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800'
-                  }`}
-                >
-                  {v.etiqueta}
-                  {v.id === 'horario' && paquetes.length > 0 && (
-                    <span className={`ml-1.5 ${vista === v.id ? 'text-purple-200' : 'text-gray-400'}`}>
-                      {paquetes.length}
-                    </span>
-                  )}
-                  {v.id === 'guardados' && horariosGuardados.length > 0 && (
-                    <span className={`ml-1.5 ${vista === v.id ? 'text-purple-200' : 'text-gray-400'}`}>
-                      {horariosGuardados.length}
-                    </span>
-                  )}
-                </button>
-              ))}
+            <nav className="mb-5 flex gap-6 border-b border-linea">
+              {VISTAS.map((v) => {
+                const activa = vista === v.id
+                const cuenta = v.id === 'horario'
+                  ? paquetes.length
+                  : v.id === 'guardados' ? horariosGuardados.length : 0
+                return (
+                  <button
+                    key={v.id}
+                    type="button"
+                    onClick={() => setVista(v.id)}
+                    aria-current={activa ? 'page' : undefined}
+                    className={`-mb-px border-b-2 pb-2.5 text-[13px] font-medium transition-colors ${
+                      activa
+                        ? 'border-verde text-verde'
+                        : 'border-transparent text-apagado hover:text-tinta'
+                    }`}
+                  >
+                    {v.etiqueta}
+                    {cuenta > 0 && (
+                      <span className={`tabular ml-1.5 text-[12px] ${activa ? 'text-verde' : 'text-tenue'}`}>
+                        {cuenta}
+                      </span>
+                    )}
+                  </button>
+                )
+              })}
             </nav>
 
             {vista === 'horario' && (

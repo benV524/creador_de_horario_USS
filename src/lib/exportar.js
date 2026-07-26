@@ -54,8 +54,8 @@ export function dibujarHorario(paquetes, franjas, opciones = {}) {
   ctx.fillStyle = '#ffffff'
   ctx.fillRect(0, 0, ANCHO_TOTAL, alto)
 
-  ctx.font = '600 17px system-ui, "Segoe UI", Roboto, sans-serif'
-  ctx.fillStyle = '#111827'
+  ctx.font = '600 17px Archivo, system-ui, "Segoe UI", sans-serif'
+  ctx.fillStyle = '#1a1f1c'
   ctx.textBaseline = 'top'
   ctx.fillText(titulo, MARGEN, MARGEN)
 
@@ -66,7 +66,7 @@ export function dibujarHorario(paquetes, franjas, opciones = {}) {
   // Bandas alternadas de cada franja
   franjas.forEach((f, i) => {
     if (i % 2 !== 1) return
-    ctx.fillStyle = '#f8fafc'
+    ctx.fillStyle = '#faf9f5'
     ctx.fillRect(
       MARGEN,
       yDeMinuto(f.inicioMin),
@@ -76,35 +76,35 @@ export function dibujarHorario(paquetes, franjas, opciones = {}) {
   })
 
   // Cabecera
-  ctx.fillStyle = '#f8fafc'
+  ctx.fillStyle = '#faf9f5'
   ctx.fillRect(MARGEN, MARGEN + ALTO_TITULO, ANCHO_TOTAL - MARGEN * 2, ALTO_CABECERA)
-  ctx.font = '600 11px system-ui, "Segoe UI", Roboto, sans-serif'
+  ctx.font = '600 11px Archivo, system-ui, "Segoe UI", sans-serif'
   ctx.textAlign = 'center'
-  ctx.fillStyle = '#64748b'
+  ctx.fillStyle = '#6b736d'
   ctx.fillText('HORA', MARGEN + ANCHO_HORAS / 2, MARGEN + ALTO_TITULO + 13)
   DIAS.forEach((d, i) => {
     ctx.fillText(d.nombre.toUpperCase(), xDia(i) + anchoDia / 2, MARGEN + ALTO_TITULO + 13)
   })
 
   // Líneas y etiquetas de cada franja
-  ctx.font = '12px system-ui, "Segoe UI", Roboto, sans-serif'
+  ctx.font = '12px "IBM Plex Mono", ui-monospace, monospace'
   for (const f of franjas) {
     const y = yDeMinuto(f.inicioMin)
-    ctx.strokeStyle = '#e2e8f0'
+    ctx.strokeStyle = '#e2e6e2'
     ctx.lineWidth = 1
     ctx.beginPath()
     ctx.moveTo(MARGEN, y)
     ctx.lineTo(ANCHO_TOTAL - MARGEN, y)
     ctx.stroke()
 
-    ctx.fillStyle = '#475569'
+    ctx.fillStyle = '#6b736d'
     ctx.textAlign = 'center'
     const centro = y + ((f.finMin - f.inicioMin) * PX_POR_MIN) / 2 + 4
     ctx.fillText(f.etiqueta, MARGEN + ANCHO_HORAS / 2, centro)
   }
 
   // Marco y separadores verticales
-  ctx.strokeStyle = '#e2e8f0'
+  ctx.strokeStyle = '#e2e6e2'
   ctx.strokeRect(MARGEN, MARGEN + ALTO_TITULO, ANCHO_TOTAL - MARGEN * 2, ALTO_CABECERA + altoGrilla)
   ctx.beginPath()
   ctx.moveTo(MARGEN, topeGrilla)
@@ -130,12 +130,12 @@ export function dibujarHorario(paquetes, franjas, opciones = {}) {
       const w = anchoCol - 2
       const h = Math.max((ev.finMin - ev.inicioMin) * PX_POR_MIN - 2, 18)
 
-      ctx.fillStyle = enChoque ? '#dc2626' : colorParaClave(ev.clave, clavesOrdenadas)
+      ctx.fillStyle = enChoque ? '#c02a2a' : colorParaClave(ev.clave, clavesOrdenadas)
       rectRedondeado(ctx, x, y, w, h, 5)
       ctx.fill()
 
       if (enChoque) {
-        ctx.strokeStyle = '#7f1d1d'
+        ctx.strokeStyle = '#8f1f1f'
         ctx.lineWidth = 2
         rectRedondeado(ctx, x + 1, y + 1, w - 2, h - 2, 4)
         ctx.stroke()
@@ -145,11 +145,11 @@ export function dibujarHorario(paquetes, franjas, opciones = {}) {
       const maxTexto = w - padding * 2
       ctx.fillStyle = '#ffffff'
 
-      ctx.font = '600 11px system-ui, "Segoe UI", Roboto, sans-serif'
+      ctx.font = '600 11px Archivo, system-ui, "Segoe UI", sans-serif'
       ctx.fillText(texto(ctx, ev.ramo, maxTexto), x + padding, y + 5)
 
       if (h > 34) {
-        ctx.font = '10px system-ui, "Segoe UI", Roboto, sans-serif'
+        ctx.font = '10px Archivo, system-ui, "Segoe UI", sans-serif'
         ctx.fillText(
           texto(ctx, `${ev.componente} ${ev.seccion} · ${ev.horaInicio}–${ev.horaFin}`, maxTexto),
           x + padding,

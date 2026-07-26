@@ -9,103 +9,118 @@ export default function CourseDetail({
   const otraSeccionActiva = paqueteDelRamo && !estaSeleccionada
 
   return (
-    <div className="fixed inset-0 z-30 flex items-start justify-center overflow-y-auto bg-black/40 p-4" onClick={onCerrar}>
+    <div
+      className="fixed inset-0 z-30 flex items-start justify-center overflow-y-auto bg-tinta/30 p-4"
+      onClick={onCerrar}
+    >
       <div
-        className="mt-10 w-full max-w-lg rounded-xl bg-white p-5 shadow-xl dark:bg-gray-900"
+        className="mt-12 w-full max-w-lg rounded border border-linea bg-hoja shadow-[0_8px_32px_rgba(26,31,28,0.18)]"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex items-start justify-between gap-3">
+        <div className="flex items-start justify-between gap-3 border-b border-linea px-4 py-3">
           <div>
-            <p className="font-mono text-xs text-gray-400">NRC {curso.nrc}</p>
-            <h3 className="text-lg font-semibold">{curso.nombre}</h3>
-            <p className="text-sm text-gray-500 dark:text-gray-400">
-              Sección {curso.seccion} · {curso.componente} · {curso.tipo}
+            <p className="tabular text-[11px] text-tenue">NRC {curso.nrc}</p>
+            <h3 className="mt-0.5 text-[15px] font-semibold leading-snug">{curso.nombre}</h3>
+            <p className="mt-0.5 text-[12px] text-apagado">
+              Sección <span className="tabular">{curso.seccion}</span> · {curso.componente} · {curso.tipo}
               {curso.esInformatica && (
-                <span className="ml-2 rounded bg-sky-100 px-1.5 py-0.5 text-[10px] font-medium text-sky-700 dark:bg-sky-950 dark:text-sky-300">
-                  Informática
-                </span>
+                <span className="rotulo ml-1.5 text-[9px] text-verde">informática</span>
               )}
             </p>
           </div>
-          <button type="button" onClick={onCerrar} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">✕</button>
+          <button
+            type="button"
+            onClick={onCerrar}
+            className="text-[13px] leading-none text-tenue transition-colors hover:text-tinta"
+          >
+            ✕
+          </button>
         </div>
 
-        <div className="mt-4">
-          <p className="text-xs font-semibold uppercase tracking-wide text-gray-400">Bloques</p>
-          <ul className="mt-1 space-y-1">
-            {curso.bloques.length === 0 && <li className="text-sm text-gray-400">Sin horario definido.</li>}
-            {curso.bloques.map((b, i) => (
-              <li key={i} className="text-sm text-gray-700 dark:text-gray-300">
-                {b.diaNombre}: {b.horaInicio} – {b.horaFin}
-              </li>
-            ))}
-          </ul>
-        </div>
+        <div className="space-y-4 px-4 py-3">
+          <div>
+            <p className="rotulo">Cuándo</p>
+            <ul className="mt-1 space-y-0.5">
+              {curso.bloques.length === 0 && (
+                <li className="text-[13px] text-tenue">Sin horario definido.</li>
+              )}
+              {curso.bloques.map((b, i) => (
+                <li key={i} className="text-[13px]">
+                  {b.diaNombre}{' '}
+                  <span className="tabular text-apagado">{b.horaInicio} – {b.horaFin}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
 
-        <div className="mt-4">
-          <p className="text-xs font-semibold uppercase tracking-wide text-gray-400">Profesor(es)</p>
-          <p className="text-sm text-gray-700 dark:text-gray-300">{curso.profesorDisplay || 'No informado'}</p>
-        </div>
+          <div>
+            <p className="rotulo">Quién la hace</p>
+            <p className="mt-1 text-[13px]">{curso.profesorDisplay || 'No informado'}</p>
+          </div>
 
-        <div className="mt-4">
-          <p className="text-xs font-semibold uppercase tracking-wide text-gray-400">Secciones ligadas</p>
-          {(!curso.liga && !curso.conector) && (
-            <p className="text-sm text-gray-400">Esta sección no tiene liga: se toma sola.</p>
-          )}
-          {(curso.liga || curso.conector) && curso.conectados.length === 0 && (
-            <p className="text-sm text-amber-600 dark:text-amber-400">
-              Declara liga {curso.liga || '—'} / conector {curso.conector || '—'}, pero la sección
-              asociada no está en el archivo.
+          <div>
+            <p className="rotulo">Secciones ligadas</p>
+            {(!curso.liga && !curso.conector) && (
+              <p className="mt-1 text-[13px] text-apagado">Esta sección se toma sola.</p>
+            )}
+            {(curso.liga || curso.conector) && curso.conectados.length === 0 && (
+              <p className="mt-1 text-[13px] text-tolerado">
+                Declara liga <span className="tabular">{curso.liga || '—'}</span> / conector{' '}
+                <span className="tabular">{curso.conector || '—'}</span>, pero su pareja no está
+                en el archivo.
+              </p>
+            )}
+            {curso.conectados.length > 0 && (
+              <>
+                <p className="mt-1 mb-1.5 text-[12px] text-apagado">
+                  Al agregar esta sección se suma automáticamente una de estas:
+                </p>
+                <ul className="divide-y divide-linea-suave border-y border-linea-suave">
+                  {curso.conectados.map((nrc) => {
+                    const conectado = cursosPorNrc.get(nrc)
+                    if (!conectado) return null
+                    const activa = paqueteDelRamo?.nrcs.includes(nrc)
+                    return (
+                      <li
+                        key={nrc}
+                        className={`flex items-center justify-between gap-2 px-1 py-1.5 text-[13px] ${
+                          activa ? 'bg-verde-suave' : ''
+                        }`}
+                      >
+                        <button
+                          type="button"
+                          className="text-left text-verde hover:underline"
+                          onClick={() => onVerDetalle(nrc)}
+                        >
+                          <span className="tabular">{nrc}</span> · {conectado.componente}{' '}
+                          <span className="tabular">{conectado.seccion}</span>
+                        </button>
+                        <span className="tabular text-[11px] text-tenue">
+                          {conectado.bloques.map((b) => `${b.dia} ${b.horaInicio}`).join(', ') || 'sin horario'}
+                        </span>
+                      </li>
+                    )
+                  })}
+                </ul>
+              </>
+            )}
+          </div>
+
+          {otraSeccionActiva && (
+            <p className="rounded border-l-2 border-tolerado bg-tolerado-suave px-3 py-2 text-[12px] text-tolerado">
+              Ya tienes este ramo con{' '}
+              {paqueteDelRamo.secciones.map((s) => `${s.componente} ${s.seccion}`).join(' + ')}.
+              Si agregas esta sección, reemplaza a la anterior.
             </p>
           )}
-          {curso.conectados.length > 0 && (
-            <>
-              <p className="mb-1 text-xs text-gray-500 dark:text-gray-400">
-                Al agregar esta sección se suma automáticamente una de estas:
-              </p>
-              <ul className="space-y-1">
-                {curso.conectados.map((nrc) => {
-                  const conectado = cursosPorNrc.get(nrc)
-                  if (!conectado) return null
-                  const activa = paqueteDelRamo?.nrcs.includes(nrc)
-                  return (
-                    <li
-                      key={nrc}
-                      className={`flex items-center justify-between gap-2 rounded-md px-2 py-1 text-sm ${
-                        activa ? 'bg-purple-50 dark:bg-purple-950/30' : 'bg-gray-50 dark:bg-gray-800'
-                      }`}
-                    >
-                      <button
-                        type="button"
-                        className="text-left text-purple-600 hover:underline dark:text-purple-400"
-                        onClick={() => onVerDetalle(nrc)}
-                      >
-                        NRC {nrc} · {conectado.componente} {conectado.seccion}
-                      </button>
-                      <span className="text-xs text-gray-400">
-                        {conectado.bloques.map((b) => `${b.dia} ${b.horaInicio}`).join(', ') || 'sin horario'}
-                      </span>
-                    </li>
-                  )
-                })}
-              </ul>
-            </>
-          )}
         </div>
 
-        {otraSeccionActiva && (
-          <p className="mt-4 rounded-lg bg-amber-50 px-3 py-2 text-xs text-amber-800 dark:bg-amber-950/40 dark:text-amber-300">
-            Ya tienes este ramo con {paqueteDelRamo.secciones.map((s) => `${s.componente} ${s.seccion}`).join(' + ')}.
-            Si agregas esta sección, reemplazará a la anterior.
-          </p>
-        )}
-
-        <div className="mt-4 space-y-2">
+        <div className="space-y-2 border-t border-linea px-4 py-3">
           {estaSeleccionada ? (
             <button
               type="button"
               onClick={() => { onQuitarRamo(paqueteDelRamo.clave); onCerrar() }}
-              className="w-full rounded-lg bg-red-100 px-3 py-2 text-sm font-medium text-red-700 hover:bg-red-200 dark:bg-red-950 dark:text-red-300"
+              className="w-full rounded border border-tope px-3 py-2 text-[13px] font-medium text-tope transition-colors hover:bg-tope-suave"
             >
               Quitar {curso.nombre} del horario
             </button>
@@ -113,10 +128,10 @@ export default function CourseDetail({
             <button
               type="button"
               onClick={() => { onAgregar(curso.nrc); onCerrar() }}
-              className="w-full rounded-lg bg-purple-600 px-3 py-2 text-sm font-medium text-white hover:bg-purple-700"
+              className="w-full rounded bg-verde px-3 py-2 text-[13px] font-medium text-white transition-colors hover:bg-verde-fuerte"
             >
               {otraSeccionActiva ? 'Cambiar a esta sección' : 'Agregar a mi horario'}
-              {curso.conectados.length > 0 && ' (con su liga)'}
+              {curso.conectados.length > 0 && ' con su liga'}
             </button>
           )}
 
@@ -124,7 +139,7 @@ export default function CourseDetail({
             <button
               type="button"
               onClick={() => { onQuitarRamo(paqueteSuelto.clave); onCerrar() }}
-              className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800"
+              className="w-full rounded border border-linea px-3 py-2 text-[13px] font-medium text-apagado transition-colors hover:border-verde-borde hover:text-verde"
             >
               Quitar esta sección independiente
             </button>
@@ -132,9 +147,9 @@ export default function CourseDetail({
             <button
               type="button"
               onClick={() => { onAgregarIndependiente(curso.nrc); onCerrar() }}
-              className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800"
+              className="w-full rounded border border-linea px-3 py-2 text-[13px] font-medium text-apagado transition-colors hover:border-verde-borde hover:text-verde"
             >
-              Agregar como ramo independiente
+              Agregar solo esta sección, sin su liga
             </button>
           )}
         </div>

@@ -3,14 +3,11 @@ import { rehidratar, contarSecciones, nombreDeArchivo } from '../lib/almacenamie
 import { exportarPNG, exportarPDF } from '../lib/exportar'
 import { describirPaquete } from '../lib/armador'
 
-function Fecha({ marca }) {
-  if (!marca) return null
-  const f = new Date(marca)
-  return (
-    <span>
-      {f.toLocaleDateString('es-CL', { day: '2-digit', month: 'short', year: 'numeric' })}
-    </span>
-  )
+function fecha(marca) {
+  if (!marca) return ''
+  return new Date(marca).toLocaleDateString('es-CL', {
+    day: '2-digit', month: 'short', year: 'numeric',
+  })
 }
 
 export default function SavedSchedules({
@@ -28,7 +25,6 @@ export default function SavedSchedules({
     else onNuevoHorario()
   }
 
-  // Cerrar el menú de descarga al hacer clic fuera.
   useEffect(() => {
     if (!menuAbierto) return
     const alHacerClic = (e) => {
@@ -38,7 +34,6 @@ export default function SavedSchedules({
     return () => document.removeEventListener('mousedown', alHacerClic)
   }, [menuAbierto])
 
-  // Se reconstruye cada horario para poder mostrar sus ramos y exportarlo sin abrirlo.
   const reconstruidos = useMemo(
     () => horarios.map((h) => ({ guardado: h, ...rehidratar(h, cursosPorNrc) })),
     [horarios, cursosPorNrc],
@@ -69,38 +64,38 @@ export default function SavedSchedules({
 
   const barra = (
     <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
-      <p className="text-sm text-gray-500 dark:text-gray-400">
+      <p className="text-[13px] text-apagado">
         {horarios.length === 0
           ? 'Sin horarios guardados'
-          : `${horarios.length} horario${horarios.length === 1 ? '' : 's'} guardado${horarios.length === 1 ? '' : 's'}`}
+          : <><span className="tabular font-medium text-tinta">{horarios.length}</span> horario{horarios.length === 1 ? '' : 's'} guardado{horarios.length === 1 ? '' : 's'}</>}
       </p>
       <button
         type="button"
         onClick={pedirNuevo}
-        className="rounded-lg bg-purple-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-purple-700"
+        className="rounded bg-verde px-3 py-1.5 text-[12px] font-medium text-white transition-colors hover:bg-verde-fuerte"
       >
-        + Nuevo horario
+        Empezar uno nuevo
       </button>
     </div>
   )
 
   const aviso = confirmandoNuevo && (
-    <div className="mb-3 rounded-lg border border-amber-300 bg-amber-50 px-3 py-2 dark:border-amber-800 dark:bg-amber-950/40">
-      <p className="text-xs text-amber-800 dark:text-amber-300">
-        El horario que tienes abierto no está guardado. Si empiezas uno nuevo se pierde.
+    <div className="mb-3 rounded border-l-2 border-tolerado bg-tolerado-suave px-3 py-2.5">
+      <p className="text-[12px] text-tolerado">
+        El horario que tienes abierto no está guardado. Si empiezas de nuevo se pierde.
       </p>
       <div className="mt-2 flex gap-2">
         <button
           type="button"
           onClick={() => { setConfirmandoNuevo(false); onNuevoHorario() }}
-          className="rounded-md bg-amber-600 px-3 py-1 text-xs font-medium text-white hover:bg-amber-700"
+          className="rounded bg-tolerado px-3 py-1 text-[12px] font-medium text-white hover:brightness-110"
         >
           Empezar de nuevo
         </button>
         <button
           type="button"
           onClick={() => setConfirmandoNuevo(false)}
-          className="rounded-md border border-amber-400 px-3 py-1 text-xs font-medium text-amber-800 hover:bg-amber-100 dark:text-amber-300 dark:hover:bg-amber-950"
+          className="rounded border border-tolerado px-3 py-1 text-[12px] font-medium text-tolerado hover:bg-black/5"
         >
           Cancelar
         </button>
@@ -113,12 +108,10 @@ export default function SavedSchedules({
       <div>
         {barra}
         {aviso}
-        <div className="rounded-xl border border-dashed border-gray-300 bg-white py-16 text-center dark:border-gray-700 dark:bg-gray-900">
-          <p className="text-sm text-gray-500 dark:text-gray-400">
-            Todavía no has guardado ningún horario.
-          </p>
-          <p className="mt-1 text-xs text-gray-400">
-            Arma uno en "Mi horario" y usa el botón <strong>Guardar horario</strong>.
+        <div className="rounded border border-dashed border-linea bg-hoja py-20 text-center">
+          <p className="text-[15px] font-semibold text-tinta">Todavía no guardas ningún horario</p>
+          <p className="mt-1 text-[13px] text-apagado">
+            Arma uno en "Mi horario" y ponle nombre en el panel <strong>Guardar</strong>.
           </p>
         </div>
       </div>
@@ -130,130 +123,127 @@ export default function SavedSchedules({
       {barra}
       {aviso}
       <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
-      {reconstruidos.map(({ guardado, paquetes, faltantes }) => {
-        const esActivo = guardado.id === activoId
-        return (
-          <div
-            key={guardado.id}
-            className={`flex flex-col rounded-xl border bg-white p-3 dark:bg-gray-900 ${
-              esActivo
-                ? 'border-purple-400 dark:border-purple-600'
-                : 'border-gray-200 dark:border-gray-800'
-            }`}
-          >
-            <div className="flex items-start justify-between gap-2">
-              <div className="min-w-0 flex-1">
-                {editando === guardado.id ? (
-                  <input
-                    autoFocus
-                    value={nombreEditado}
-                    onChange={(e) => setNombreEditado(e.target.value)}
-                    onBlur={() => confirmarNombre(guardado.id)}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter') confirmarNombre(guardado.id)
-                      if (e.key === 'Escape') setEditando(null)
-                    }}
-                    className="w-full rounded-md border border-purple-400 px-2 py-1 text-sm font-semibold dark:bg-gray-950"
-                  />
-                ) : (
-                  <h3 className="truncate text-sm font-semibold" title={guardado.nombre}>
-                    {guardado.nombre}
-                  </h3>
-                )}
-                <p className="mt-0.5 text-[11px] text-gray-400">
-                  {paquetes.length} ramos · {contarSecciones(guardado)} secciones ·{' '}
-                  <Fecha marca={guardado.actualizadoEn} />
-                </p>
+        {reconstruidos.map(({ guardado, paquetes, faltantes }) => {
+          const esActivo = guardado.id === activoId
+          return (
+            <article
+              key={guardado.id}
+              className={`flex flex-col rounded border bg-hoja ${
+                esActivo ? 'border-verde-borde' : 'border-linea'
+              }`}
+            >
+              <div className="flex items-start justify-between gap-2 border-b border-linea px-3 py-2.5">
+                <div className="min-w-0 flex-1">
+                  {editando === guardado.id ? (
+                    <input
+                      autoFocus
+                      value={nombreEditado}
+                      onChange={(e) => setNombreEditado(e.target.value)}
+                      onBlur={() => confirmarNombre(guardado.id)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') confirmarNombre(guardado.id)
+                        if (e.key === 'Escape') setEditando(null)
+                      }}
+                      className="w-full rounded border border-verde px-2 py-1 text-[13px] font-semibold focus:outline-none"
+                    />
+                  ) : (
+                    <h3 className="truncate text-[13px] font-semibold" title={guardado.nombre}>
+                      {guardado.nombre}
+                    </h3>
+                  )}
+                  <p className="mt-0.5 text-[11px] text-tenue">
+                    <span className="tabular">{paquetes.length}</span> ramos ·{' '}
+                    <span className="tabular">{contarSecciones(guardado)}</span> secciones ·{' '}
+                    <span className="tabular">{fecha(guardado.actualizadoEn)}</span>
+                  </p>
+                </div>
+                {esActivo && <span className="rotulo shrink-0 text-[9px] text-verde">abierto</span>}
               </div>
-              {esActivo && (
-                <span className="shrink-0 rounded-full bg-purple-100 px-2 py-0.5 text-[10px] font-medium text-purple-700 dark:bg-purple-950 dark:text-purple-300">
-                  Abierto
-                </span>
+
+              <ul className="flex-1 space-y-0.5 px-3 py-2.5">
+                {paquetes.slice(0, 5).map((p) => (
+                  <li key={p.clave} className="truncate text-[12px] text-apagado">
+                    {p.ramo} <span className="text-tenue">· {describirPaquete(p)}</span>
+                  </li>
+                ))}
+                {paquetes.length > 5 && (
+                  <li className="text-[12px] text-tenue">y {paquetes.length - 5} más…</li>
+                )}
+                {paquetes.length === 0 && (
+                  <li className="text-[12px] text-tope">
+                    Ningún NRC de este horario existe en el Excel cargado.
+                  </li>
+                )}
+              </ul>
+
+              {faltantes.length > 0 && (
+                <p className="mx-3 mb-2 rounded border-l-2 border-tolerado bg-tolerado-suave px-2 py-1 text-[11px] text-tolerado">
+                  Faltan <span className="tabular">{faltantes.length}</span> NRC:{' '}
+                  <span className="tabular">{faltantes.slice(0, 4).join(', ')}</span>
+                  {faltantes.length > 4 && '…'}
+                </p>
               )}
-            </div>
 
-            <ul className="mt-2 flex-1 space-y-0.5">
-              {paquetes.slice(0, 5).map((p) => (
-                <li key={p.clave} className="truncate text-[11px] text-gray-600 dark:text-gray-400">
-                  {p.ramo} <span className="text-gray-400">· {describirPaquete(p)}</span>
-                </li>
-              ))}
-              {paquetes.length > 5 && (
-                <li className="text-[11px] text-gray-400">y {paquetes.length - 5} más…</li>
-              )}
-              {paquetes.length === 0 && (
-                <li className="text-[11px] text-red-500">
-                  Ningún NRC de este horario existe en el Excel cargado.
-                </li>
-              )}
-            </ul>
-
-            {faltantes.length > 0 && (
-              <p className="mt-2 rounded-md bg-amber-50 px-2 py-1 text-[10px] text-amber-800 dark:bg-amber-950/40 dark:text-amber-300">
-                No se encontraron {faltantes.length} NRC: {faltantes.slice(0, 4).join(', ')}
-                {faltantes.length > 4 && '…'}
-              </p>
-            )}
-
-            <div className="mt-3 flex items-center gap-1.5">
-              <button
-                type="button"
-                onClick={() => onAbrir(guardado)}
-                disabled={paquetes.length === 0}
-                className="flex-1 rounded-lg bg-purple-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-purple-700 disabled:opacity-40"
-              >
-                Abrir
-              </button>
-
-              <div className="relative">
+              <div className="flex items-center gap-1.5 border-t border-linea px-3 py-2.5">
                 <button
                   type="button"
-                  onClick={() => setMenuAbierto(menuAbierto === guardado.id ? null : guardado.id)}
+                  onClick={() => onAbrir(guardado)}
                   disabled={paquetes.length === 0}
-                  className="rounded-lg border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-600 hover:bg-gray-100 disabled:opacity-40 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800"
+                  className="flex-1 rounded bg-verde px-3 py-1.5 text-[12px] font-medium text-white transition-colors hover:bg-verde-fuerte disabled:opacity-40"
                 >
-                  Descargar ▾
+                  Abrir
                 </button>
-                {menuAbierto === guardado.id && (
-                  <div className="absolute right-0 z-20 mt-1 w-36 overflow-hidden rounded-lg border border-gray-200 bg-white shadow-lg dark:border-gray-700 dark:bg-gray-800">
-                    <button
-                      type="button"
-                      onClick={() => descargar(guardado, paquetes, 'png')}
-                      className="block w-full px-3 py-2 text-left text-xs hover:bg-gray-100 dark:hover:bg-gray-700"
-                    >
-                      Imagen (PNG)
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => descargar(guardado, paquetes, 'pdf')}
-                      className="block w-full px-3 py-2 text-left text-xs hover:bg-gray-100 dark:hover:bg-gray-700"
-                    >
-                      Documento (PDF)
-                    </button>
-                  </div>
-                )}
-              </div>
 
-              <button
-                type="button"
-                onClick={() => { setEditando(guardado.id); setNombreEditado(guardado.nombre) }}
-                title="Renombrar"
-                className="rounded-lg border border-gray-300 px-2 py-1.5 text-xs text-gray-500 hover:bg-gray-100 dark:border-gray-700 dark:hover:bg-gray-800"
-              >
-                ✎
-              </button>
-              <button
-                type="button"
-                onClick={() => onEliminar(guardado)}
-                title="Eliminar"
-                className="rounded-lg border border-gray-300 px-2 py-1.5 text-xs text-gray-500 hover:bg-red-50 hover:text-red-600 dark:border-gray-700 dark:hover:bg-red-950/40"
-              >
-                🗑
-              </button>
-            </div>
-          </div>
-        )
-      })}
+                <div className="relative">
+                  <button
+                    type="button"
+                    onClick={() => setMenuAbierto(menuAbierto === guardado.id ? null : guardado.id)}
+                    disabled={paquetes.length === 0}
+                    aria-expanded={menuAbierto === guardado.id}
+                    className="rounded border border-linea px-2.5 py-1.5 text-[12px] font-medium text-apagado transition-colors hover:border-verde-borde hover:text-verde disabled:opacity-40"
+                  >
+                    Descargar ▾
+                  </button>
+                  {menuAbierto === guardado.id && (
+                    <div className="absolute right-0 z-20 mt-1 w-36 overflow-hidden rounded border border-linea bg-hoja shadow-[0_4px_12px_rgba(26,31,28,0.12)]">
+                      <button
+                        type="button"
+                        onClick={() => descargar(guardado, paquetes, 'png')}
+                        className="block w-full px-3 py-2 text-left text-[12px] transition-colors hover:bg-verde-suave"
+                      >
+                        Imagen PNG
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => descargar(guardado, paquetes, 'pdf')}
+                        className="block w-full border-t border-linea px-3 py-2 text-left text-[12px] transition-colors hover:bg-verde-suave"
+                      >
+                        Documento PDF
+                      </button>
+                    </div>
+                  )}
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => { setEditando(guardado.id); setNombreEditado(guardado.nombre) }}
+                  title="Cambiar el nombre"
+                  className="rounded border border-linea px-2 py-1.5 text-[12px] text-apagado transition-colors hover:border-verde-borde hover:text-verde"
+                >
+                  Nombre
+                </button>
+                <button
+                  type="button"
+                  onClick={() => onEliminar(guardado)}
+                  title="Eliminar este horario"
+                  className="rounded border border-linea px-2 py-1.5 text-[12px] text-apagado transition-colors hover:border-tope hover:text-tope"
+                >
+                  Borrar
+                </button>
+              </div>
+            </article>
+          )
+        })}
       </div>
     </div>
   )

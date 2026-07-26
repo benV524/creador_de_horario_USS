@@ -1,10 +1,21 @@
 import { DIAS } from './parseExcel.js'
 import { seSuperponen, topePermitido } from './armador.js'
 
-// Paleta estable para diferenciar ramos en la grilla.
+// Paleta estable para diferenciar ramos en la grilla. Son tonos profundos y algo
+// desaturados: se distinguen entre sí, aguantan texto blanco encima y conviven con el
+// papel sin competir. Se evita el rojo, reservado para los topes, y el verde de
+// identidad, para que un ramo no se confunda con la interfaz.
 const PALETA = [
-  '#8b5cf6', '#0ea5e9', '#f97316', '#10b981', '#ec4899',
-  '#eab308', '#6366f1', '#14b8a6', '#f43f5e', '#84cc16',
+  '#31607f', // azul acero
+  '#a2542e', // terracota
+  '#5b4b8a', // morado apagado
+  '#2e7266', // verde mar
+  '#8c6d1f', // mostaza
+  '#9c3b5a', // vino
+  '#4a6c2f', // oliva
+  '#6b4e3d', // café
+  '#3f5a8a', // azul pizarra
+  '#7d4a6b', // ciruela
 ]
 
 export function colorParaClave(clave, clavesOrdenadas) {

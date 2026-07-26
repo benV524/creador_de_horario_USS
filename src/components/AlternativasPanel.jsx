@@ -21,12 +21,9 @@ function Horario({ paquete }) {
     (a, b) => (ORDEN_DIA[a.dia] - ORDEN_DIA[b.dia]) || (a.inicioMin - b.inicioMin),
   )
   return (
-    <div className="mt-1 flex flex-wrap gap-1">
+    <div className="mt-1.5 flex flex-wrap gap-1">
       {bloques.map((b, i) => (
-        <span
-          key={i}
-          className="rounded bg-gray-100 px-1.5 py-0.5 text-[10px] text-gray-700 dark:bg-gray-800 dark:text-gray-300"
-        >
+        <span key={i} className="tabular rounded-[3px] bg-papel px-1.5 py-0.5 text-[10px] text-apagado">
           {b.dia} {b.horaInicio}–{b.horaFin}
         </span>
       ))}
@@ -55,34 +52,35 @@ export default function AlternativasPanel({
   const libres = opciones.filter((o) => o.total === 0).length
 
   return (
-    <div className="rounded-xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900">
-      <div className="flex items-start justify-between gap-2 border-b border-gray-100 p-3 dark:border-gray-800">
+    <section className="rounded border border-linea bg-hoja">
+      <div className="flex items-start justify-between gap-2 border-b border-linea px-3 py-2.5">
         <div className="min-w-0">
-          <p className="text-[11px] uppercase tracking-wide text-gray-400">
-            Otras secciones de {esIndependiente && '(independiente)'}
+          <p className="rotulo">
+            Otras secciones {esIndependiente && '(suelta)'}
           </p>
-          <h2 className="truncate text-sm font-semibold" title={ramo}>{ramo}</h2>
-          <p className="mt-0.5 text-xs text-gray-500 dark:text-gray-400">
-            {opciones.length}{' '}
+          <h2 className="mt-0.5 truncate text-[13px] font-semibold" title={ramo}>{ramo}</h2>
+          <p className="mt-0.5 text-[12px] text-apagado">
+            <span className="tabular">{opciones.length}</span>{' '}
             {esIndependiente
               ? (opciones.length === 1 ? 'sección' : 'secciones')
-              : (opciones.length === 1 ? 'combinación' : 'combinaciones')} ·{' '}
-            <span className={libres > 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-amber-600 dark:text-amber-400'}>
-              {libres} sin topes
+              : (opciones.length === 1 ? 'combinación' : 'combinaciones')}
+            {' · '}
+            <span className={libres > 0 ? 'text-verde' : 'text-tolerado'}>
+              <span className="tabular">{libres}</span> sin topes
             </span>
           </p>
         </div>
         <button
           type="button"
           onClick={onCerrar}
-          className="shrink-0 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
+          className="shrink-0 text-[13px] leading-none text-tenue transition-colors hover:text-tinta"
           title="Cerrar"
         >
           ✕
         </button>
       </div>
 
-      <div className="max-h-[34rem] space-y-2 overflow-y-auto p-2">
+      <div className="max-h-[34rem] divide-y divide-linea-suave overflow-y-auto">
         {opciones.map(({ paquete, choques, prohibidos, total }) => {
           const esActual = paquete.id === paqueteActual?.id
           const choquesUnicos = [...new Map(
@@ -90,26 +88,13 @@ export default function AlternativasPanel({
           ).values()]
 
           return (
-            <div
-              key={paquete.id}
-              className={`rounded-lg border p-2 ${
-                esActual
-                  ? 'border-purple-400 bg-purple-50 dark:border-purple-600 dark:bg-purple-950/30'
-                  : 'border-gray-200 dark:border-gray-800'
-              }`}
-            >
+            <div key={paquete.id} className={`px-3 py-2.5 ${esActual ? 'bg-verde-suave' : ''}`}>
               <div className="flex items-center justify-between gap-2">
-                <p className="text-xs font-semibold">{describirPaquete(paquete)}</p>
+                <p className="text-[12px] font-semibold">{describirPaquete(paquete)}</p>
                 {total === 0 ? (
-                  <span className="shrink-0 rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-medium text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300">
-                    Sin topes
-                  </span>
+                  <span className="rotulo shrink-0 text-[9px] text-verde">libre</span>
                 ) : (
-                  <span className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] font-medium ${
-                    prohibidos > 0
-                      ? 'bg-red-100 text-red-700 dark:bg-red-950 dark:text-red-300'
-                      : 'bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-300'
-                  }`}>
+                  <span className={`rotulo shrink-0 text-[9px] ${prohibidos > 0 ? 'text-tope' : 'text-tolerado'}`}>
                     {total} tope{total === 1 ? '' : 's'}
                   </span>
                 )}
@@ -117,7 +102,7 @@ export default function AlternativasPanel({
 
               <Horario paquete={paquete} />
 
-              <p className="mt-1 truncate text-[10px] text-gray-500 dark:text-gray-400">
+              <p className="mt-1 truncate text-[11px] text-apagado">
                 {[...new Set(paquete.secciones.map((s) => s.profesorDisplay).filter(Boolean))].join(' · ') || 'Profesor no informado'}
               </p>
 
@@ -126,13 +111,9 @@ export default function AlternativasPanel({
                   {choquesUnicos.map((c, i) => (
                     <li
                       key={i}
-                      className={`text-[10px] ${
-                        c.permitido
-                          ? 'text-amber-600 dark:text-amber-400'
-                          : 'text-red-600 dark:text-red-400'
-                      }`}
+                      className={`text-[11px] ${c.permitido ? 'text-tolerado' : 'text-tope'}`}
                     >
-                      Choca con {c.con} ({c.dia} {c.hora})
+                      Se pisa con {c.con} (<span className="tabular">{c.dia} {c.hora}</span>)
                       {!c.permitido && ' — mismo tipo'}
                     </li>
                   ))}
@@ -140,16 +121,16 @@ export default function AlternativasPanel({
               )}
 
               <div className="mt-2 flex items-center gap-2">
-                <span className="flex-1 font-mono text-[10px] text-gray-400">
+                <span className="tabular flex-1 text-[10px] text-tenue">
                   {paquete.nrcs.join(' · ')}
                 </span>
                 {esActual ? (
-                  <span className="text-[11px] font-medium text-purple-600 dark:text-purple-400">En uso</span>
+                  <span className="rotulo text-[9px] text-verde">en uso</span>
                 ) : (
                   <button
                     type="button"
                     onClick={() => onElegir(paquete)}
-                    className="rounded-md bg-purple-600 px-2.5 py-1 text-[11px] font-medium text-white hover:bg-purple-700"
+                    className="rounded bg-verde px-2.5 py-1 text-[11px] font-medium text-white transition-colors hover:bg-verde-fuerte"
                   >
                     Usar esta
                   </button>
@@ -160,11 +141,11 @@ export default function AlternativasPanel({
         })}
 
         {opciones.length === 0 && (
-          <p className="py-8 text-center text-xs text-gray-400">
-            Este ramo no tiene combinaciones alternativas en el archivo.
+          <p className="px-3 py-10 text-center text-[12px] text-apagado">
+            Este ramo no tiene otras combinaciones en el archivo.
           </p>
         )}
       </div>
-    </div>
+    </section>
   )
 }

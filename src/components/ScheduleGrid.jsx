@@ -2,10 +2,11 @@ import { useMemo } from 'react'
 import { DIAS, calcularColumnas, colorParaClave, claveEvento, detectarChoques } from '../lib/horario'
 
 const PX_POR_MIN = 1.2
-const ANCHO_HORA = 132
+const ANCHO_HORA = 116
 
-// La grilla se mantiene clara en ambos temas: es una "hoja" de horario y así se ve
-// idéntica a la imagen que se exporta.
+// getDay(): 0 domingo, 1 lunes… La grilla parte en lunes y no muestra domingo.
+const LETRA_POR_DIA_JS = { 1: 'M', 2: 'T', 3: 'W', 4: 'R', 5: 'F', 6: 'S' }
+
 export default function ScheduleGrid({ paquetes, franjas, topesAceptados, onSeleccionarRamo }) {
   const eventos = useMemo(() => paquetes.flatMap((p) => p.eventos), [paquetes])
   const clavesOrdenadas = useMemo(() => paquetes.map((p) => p.clave), [paquetes])
@@ -14,8 +15,10 @@ export default function ScheduleGrid({ paquetes, franjas, topesAceptados, onSele
     [eventos, topesAceptados],
   )
 
+  // Marcar el día de hoy ayuda a leer "qué tengo ahora" sin contar columnas.
+  const hoy = LETRA_POR_DIA_JS[new Date().getDay()] ?? null
+
   const inicioGrilla = franjas[0]?.inicioMin ?? 8 * 60
-  const finGrilla = franjas[franjas.length - 1]?.finMin ?? 20 * 60
 
   const eventosPorDia = useMemo(() => {
     const mapa = new Map(DIAS.map((d) => [d.letra, []]))
@@ -28,32 +31,33 @@ export default function ScheduleGrid({ paquetes, franjas, topesAceptados, onSele
   const altoFranja = (f) => (f.finMin - f.inicioMin) * PX_POR_MIN
 
   return (
-    <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+    <div className="overflow-hidden rounded border border-linea bg-hoja shadow-[0_1px_3px_rgba(26,31,28,0.06)]">
       <div
         className="grid"
         style={{ gridTemplateColumns: `${ANCHO_HORA}px repeat(6, minmax(0, 1fr))` }}
       >
-        <div className="border-b border-r border-slate-200 bg-slate-50 px-3 py-3.5 text-center text-[11px] font-semibold uppercase tracking-widest text-slate-500">
+        <div className="rotulo border-b border-r border-linea px-3 py-3 text-center">
           Hora
         </div>
         {DIAS.map((d, i) => (
           <div
             key={d.letra}
-            className={`border-b border-slate-200 bg-slate-50 px-2 py-3.5 text-center text-[11px] font-semibold uppercase tracking-widest text-slate-500 ${
+            className={`rotulo relative border-b border-linea px-2 py-3 text-center ${
               i < DIAS.length - 1 ? 'border-r' : ''
-            }`}
+            } ${d.letra === hoy ? 'text-verde' : ''}`}
           >
             {d.nombre}
+            {d.letra === hoy && (
+              <span className="absolute inset-x-0 bottom-0 h-[2px] bg-verde" aria-hidden="true" />
+            )}
           </div>
         ))}
 
-        <div className="border-r border-slate-200">
-          {franjas.map((f, i) => (
+        <div className="border-r border-linea">
+          {franjas.map((f) => (
             <div
               key={f.inicioMin}
-              className={`flex items-center justify-center border-b border-slate-100 px-2 text-center text-[13px] font-medium tracking-tight text-slate-600 ${
-                i % 2 === 1 ? 'bg-slate-50/70' : ''
-              }`}
+              className="tabular flex items-center justify-center border-b border-linea-suave px-2 text-center text-[12px] text-apagado"
               style={{ height: altoFranja(f) }}
             >
               {f.etiqueta}
@@ -64,12 +68,14 @@ export default function ScheduleGrid({ paquetes, franjas, topesAceptados, onSele
         {DIAS.map((d, iDia) => (
           <div
             key={d.letra}
-            className={`relative ${iDia < DIAS.length - 1 ? 'border-r border-slate-200' : ''}`}
+            className={`relative ${iDia < DIAS.length - 1 ? 'border-r border-linea' : ''} ${
+              d.letra === hoy ? 'bg-verde-suave/40' : ''
+            }`}
           >
-            {franjas.map((f, i) => (
+            {franjas.map((f) => (
               <div
                 key={f.inicioMin}
-                className={`border-b border-slate-100 ${i % 2 === 1 ? 'bg-slate-50/70' : ''}`}
+                className="border-b border-linea-suave"
                 style={{ height: altoFranja(f) }}
               />
             ))}
@@ -79,7 +85,6 @@ export default function ScheduleGrid({ paquetes, franjas, topesAceptados, onSele
                 const clave = claveEvento(ev)
                 const enChoque = idsEnChoque.has(clave)
                 const aceptado = idsAceptados.has(clave)
-                const color = colorParaClave(ev.clave, clavesOrdenadas)
                 const anchoPct = 100 / ev.totalColumnas
                 const alto = Math.max((ev.finMin - ev.inicioMin) * PX_POR_MIN - 4, 20)
 
@@ -88,26 +93,26 @@ export default function ScheduleGrid({ paquetes, franjas, topesAceptados, onSele
                     type="button"
                     key={clave}
                     onClick={() => onSeleccionarRamo?.(ev.clave)}
-                    className={`absolute overflow-hidden rounded-lg px-2 py-1.5 text-left leading-tight text-white shadow-sm transition hover:brightness-110 ${
-                      enChoque ? 'z-10 ring-2 ring-red-600' : ''
-                    } ${aceptado ? 'ring-2 ring-dashed ring-amber-400' : ''}`}
+                    className={`absolute overflow-hidden rounded-[3px] px-2 py-1.5 text-left leading-tight text-white transition hover:brightness-110 ${
+                      enChoque ? 'z-10 ring-2 ring-tope ring-offset-1' : ''
+                    } ${aceptado ? 'ring-[1.5px] ring-dashed ring-tolerado ring-offset-1' : ''}`}
                     style={{
                       top: (ev.inicioMin - inicioGrilla) * PX_POR_MIN + 2,
                       height: alto,
                       left: `calc(${ev.colIdx * anchoPct}% + 3px)`,
                       width: `calc(${anchoPct}% - 6px)`,
-                      background: enChoque ? '#dc2626' : color,
+                      background: enChoque ? 'var(--color-tope)' : colorParaClave(ev.clave, clavesOrdenadas),
                     }}
                     title={`${ev.ramo} · ${ev.componente} ${ev.seccion} · NRC ${ev.nrc}\n${ev.horaInicio}–${ev.horaFin}\n${ev.profesor}${aceptado ? '\n(tope aceptado)' : ''}`}
                   >
                     <p className="truncate text-[11px] font-semibold">{ev.ramo}</p>
                     {alto > 40 && (
-                      <p className="truncate text-[10px] opacity-95">
+                      <p className="tabular truncate text-[10px] opacity-95">
                         {ev.componente} {ev.seccion} · {ev.horaInicio}–{ev.horaFin}
                       </p>
                     )}
                     {alto > 62 && ev.profesor && (
-                      <p className="truncate text-[10px] opacity-80">{ev.profesor}</p>
+                      <p className="truncate text-[10px] opacity-75">{ev.profesor}</p>
                     )}
                   </button>
                 )

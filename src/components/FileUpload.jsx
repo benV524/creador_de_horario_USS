@@ -15,7 +15,7 @@ export default function FileUpload({ onCargado }) {
       const arrayBuffer = await file.arrayBuffer()
       const { cursos, warnings, franjas, hoja } = parseWorkbook(arrayBuffer)
       if (cursos.length === 0) {
-        setError('El archivo no contiene ramos reconocibles. Revisa que sea el Excel institucional con las columnas esperadas.')
+        setError('El archivo no tiene ramos reconocibles. Revisa que sea el Excel de la universidad, con sus columnas originales.')
         setCargando(false)
         return
       }
@@ -28,33 +28,54 @@ export default function FileUpload({ onCargado }) {
   }, [onCargado])
 
   return (
-    <div
-      onDragOver={(e) => { e.preventDefault(); setArrastrando(true) }}
-      onDragLeave={() => setArrastrando(false)}
-      onDrop={(e) => {
-        e.preventDefault()
-        setArrastrando(false)
-        procesarArchivo(e.dataTransfer.files?.[0])
-      }}
-      onClick={() => inputRef.current?.click()}
-      className={`cursor-pointer rounded-xl border-2 border-dashed p-10 text-center transition-colors ${
-        arrastrando ? 'border-purple-400 bg-purple-50 dark:bg-purple-950/30' : 'border-gray-300 dark:border-gray-700'
-      }`}
-    >
-      <input
-        ref={inputRef}
-        type="file"
-        accept=".xlsx,.xls"
-        className="hidden"
-        onChange={(e) => procesarArchivo(e.target.files?.[0])}
-      />
-      <p className="text-lg font-medium text-gray-800 dark:text-gray-100">
-        {cargando ? 'Procesando…' : 'Arrastra el Excel de horarios o haz clic para elegirlo'}
-      </p>
-      <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-        Formato esperado: NRC, TIPO, SECCION, COMPONENTE, NOMBRE, LIGA, CONECTOR, HR_INICIO, días, profesor
-      </p>
-      {error && <p className="mt-3 text-sm text-red-600 dark:text-red-400">{error}</p>}
+    <div>
+      <button
+        type="button"
+        onDragOver={(e) => { e.preventDefault(); setArrastrando(true) }}
+        onDragLeave={() => setArrastrando(false)}
+        onDrop={(e) => {
+          e.preventDefault()
+          setArrastrando(false)
+          procesarArchivo(e.dataTransfer.files?.[0])
+        }}
+        onClick={() => inputRef.current?.click()}
+        className={`w-full rounded border border-dashed px-8 py-12 text-center transition-colors ${
+          arrastrando
+            ? 'border-verde bg-verde-suave'
+            : 'border-linea bg-hoja hover:border-verde-borde hover:bg-verde-suave/50'
+        }`}
+      >
+        <input
+          ref={inputRef}
+          type="file"
+          accept=".xlsx,.xls"
+          className="hidden"
+          onChange={(e) => procesarArchivo(e.target.files?.[0])}
+        />
+        <p className="text-[15px] font-semibold text-tinta">
+          {cargando ? 'Leyendo el archivo…' : 'Arrastra aquí el Excel de horarios'}
+        </p>
+        <p className="mt-1 text-[13px] text-apagado">
+          {cargando ? 'Un momento.' : 'O haz clic para buscarlo en tu computador.'}
+        </p>
+      </button>
+
+      <div className="mt-4 rounded border border-linea bg-hoja px-4 py-3">
+        <p className="rotulo">Columnas que necesita</p>
+        <p className="tabular mt-1.5 text-[12px] leading-relaxed text-apagado">
+          NRC · TIPO · SECCION · COMPONENTE · NOMBRE · LIGA · CONECTOR · HR_INICIO ·
+          LUNES a SABADO · NOMBRE_ · APELLIDO
+        </p>
+        <p className="mt-2 text-[12px] text-tenue">
+          El archivo se lee en tu navegador y no se envía a ningún servidor.
+        </p>
+      </div>
+
+      {error && (
+        <p className="mt-3 rounded border-l-2 border-tope bg-tope-suave px-3 py-2 text-[13px] text-tope">
+          {error}
+        </p>
+      )}
     </div>
   )
 }
