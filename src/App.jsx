@@ -5,6 +5,7 @@ import CourseDetail from './components/CourseDetail'
 import ScheduleView from './components/ScheduleView'
 import AutoBuilder from './components/AutoBuilder'
 import Avisos from './components/Avisos'
+import { SpeedInsights } from '@vercel/speed-insights/react'
 import {
   mejorPaqueteParaSeccion,
   construirPaqueteIndependiente,
@@ -233,6 +234,9 @@ function App() {
           </>
         )}
       </main>
+
+      {/* No renderiza nada: solo recolecta métricas de rendimiento en el despliegue de Vercel. */}
+      <SpeedInsights />
     </div>
   )
 }
