@@ -130,7 +130,7 @@ function App() {
       <header className="border-b border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900">
         <div className="mx-auto flex max-w-[1760px] flex-wrap items-center justify-between gap-3 px-4 py-3">
           <div>
-            <h1 className="text-lg font-bold tracking-tight">Horarios ICIF</h1>
+            <h1 className="text-lg font-bold tracking-tight">Horario USS</h1>
             <p className="text-xs text-gray-500 dark:text-gray-400">
               Consulta la oferta y arma tu horario sin topes.
             </p>
