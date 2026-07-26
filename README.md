@@ -1,4 +1,4 @@
-# Horarios ICIF
+# Horario USS
 
 Herramienta web para consultar la oferta de ramos de un semestre y armar el horario personal
 sin topes. Todo corre en el navegador: el Excel institucional se lee en el cliente y no se
