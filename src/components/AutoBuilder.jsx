@@ -59,15 +59,15 @@ export default function AutoBuilder({ cursos, ramosSeleccionados, onAplicar, onN
 
   return (
     <div className="grid gap-4 lg:grid-cols-[1fr_360px]">
-      <section className="rounded border border-linea bg-hoja">
+      <section className="rounded-2xl border border-linea bg-hoja tarjeta">
         <div className="border-b border-linea p-3">
           <h2 className="rotulo">Paso 1 — Elige los ramos</h2>
-          <p className="mt-1 text-[13px] text-apagado">
+          <p className="mt-1 text-[14px] text-apagado">
             Marca el ramo, no la sección. La app prueba todas las combinaciones de secciones y
             ligas hasta encontrar una sin topes.
           </p>
           <input
-            className="mt-2.5 w-full rounded border border-linea bg-hoja px-2.5 py-2 text-[13px] placeholder:text-tenue focus:border-verde focus:outline-none"
+            className="mt-2.5 w-full rounded-xl border border-linea bg-hoja px-2.5 py-2 text-[14px] placeholder:text-tenue focus:border-azul focus:outline-none"
             placeholder="Filtrar ramos"
             value={filtro}
             onChange={(e) => setFiltro(e.target.value)}
@@ -79,34 +79,34 @@ export default function AutoBuilder({ cursos, ramosSeleccionados, onAplicar, onN
             return (
               <label
                 key={r.nombre}
-                className={`flex cursor-pointer items-center gap-3 px-3 py-2 text-[13px] transition-colors hover:bg-papel ${
-                  marcado ? 'bg-verde-suave' : ''
+                className={`flex cursor-pointer items-center gap-3 px-3 py-2 text-[14px] transition-colors hover:bg-fondo ${
+                  marcado ? 'bg-azul-suave' : ''
                 }`}
               >
                 <input
                   type="checkbox"
                   checked={marcado}
                   onChange={() => alternar(r.nombre)}
-                  className="h-3.5 w-3.5 accent-[#24503c]"
+                  className="h-4 w-4 accent-azul"
                 />
                 <span className="flex-1">{r.nombre}</span>
                 {r.esInformatica && (
-                  <span className="rotulo text-[9px] text-apagado">ICIF</span>
+                  <span className="rotulo text-[10px] text-apagado">ICIF</span>
                 )}
-                <span className="tabular w-28 text-right text-[11px] text-tenue">
+                <span className="tabular w-28 text-right text-[12px] text-tenue">
                   {r.opciones} {r.opciones === 1 ? 'combinación' : 'combinaciones'}
                 </span>
               </label>
             )
           })}
           {visibles.length === 0 && (
-            <p className="py-10 text-center text-[13px] text-apagado">Ningún ramo coincide.</p>
+            <p className="py-10 text-center text-[14px] text-apagado">Ningún ramo coincide.</p>
           )}
         </div>
       </section>
 
       <div className="space-y-4">
-        <section className="rounded border border-linea bg-hoja">
+        <section className="rounded-2xl border border-linea bg-hoja tarjeta">
           <h2 className="rotulo border-b border-linea px-3 py-2.5">
             Paso 2 — Armar ({elegidos.length})
           </h2>
@@ -115,14 +115,14 @@ export default function AutoBuilder({ cursos, ramosSeleccionados, onAplicar, onN
               {elegidos.map((n) => (
                 <span
                   key={n}
-                  className="inline-flex items-center gap-1.5 rounded-[3px] border border-verde-borde bg-verde-suave px-2 py-0.5 text-[11px] font-medium text-verde"
+                  className="inline-flex items-center gap-1.5 rounded-lg border border-azul-borde bg-azul-suave px-2 py-0.5 text-[12px] font-medium text-azul"
                 >
                   {n}
                   <button type="button" onClick={() => alternar(n)} className="hover:opacity-60">✕</button>
                 </span>
               ))}
               {elegidos.length === 0 && (
-                <p className="text-[13px] text-apagado">Aún no marcas ningún ramo.</p>
+                <p className="text-[14px] text-apagado">Aún no marcas ningún ramo.</p>
               )}
             </div>
 
@@ -131,7 +131,7 @@ export default function AutoBuilder({ cursos, ramosSeleccionados, onAplicar, onN
                 type="button"
                 onClick={() => armar(false)}
                 disabled={elegidos.length === 0}
-                className="flex-1 rounded bg-verde px-3 py-2 text-[13px] font-medium text-white transition-colors hover:bg-verde-fuerte disabled:opacity-40"
+                className="flex-1 rounded-full bg-azul px-3 py-2 text-[14px] font-medium text-white transition-colors hover:bg-azul-fuerte disabled:opacity-40"
               >
                 Armar horario
               </button>
@@ -139,7 +139,7 @@ export default function AutoBuilder({ cursos, ramosSeleccionados, onAplicar, onN
                 <button
                   type="button"
                   onClick={() => { setElegidos([]); setResultado(null) }}
-                  className="rounded border border-linea px-3 py-2 text-[13px] font-medium text-apagado transition-colors hover:border-verde-borde hover:text-verde"
+                  className="rounded-full border border-linea px-3 py-2 text-[14px] font-medium text-apagado transition-colors hover:border-azul-borde hover:text-azul"
                 >
                   Vaciar
                 </button>
@@ -149,14 +149,14 @@ export default function AutoBuilder({ cursos, ramosSeleccionados, onAplicar, onN
         </section>
 
         {resultado && (
-          <section className="rounded border border-linea bg-hoja">
+          <section className="rounded-2xl border border-linea bg-hoja tarjeta">
             <h2 className="rotulo border-b border-linea px-3 py-2.5">Paso 3 — Resultado</h2>
             <div className="p-3">
               {resultado.exito ? (
                 <>
-                  <p className={`text-[13px] ${
+                  <p className={`text-[14px] ${
                     resultado.topes === 0
-                      ? 'text-verde'
+                      ? 'text-azul'
                       : resultado.forzado ? 'text-tope' : 'text-tolerado'
                   }`}>
                     {resultado.topes === 0
@@ -167,7 +167,7 @@ export default function AutoBuilder({ cursos, ramosSeleccionados, onAplicar, onN
                   </p>
                   <ul className="mt-2.5 divide-y divide-linea-suave border-y border-linea-suave">
                     {resultado.paquetes.map((p) => (
-                      <li key={p.id} className="py-1.5 text-[12px]">
+                      <li key={p.id} className="py-1.5 text-[13px]">
                         <span className="font-medium">{p.ramo}</span>
                         <span className="text-apagado"> — {describirPaquete(p)}</span>
                       </li>
@@ -176,19 +176,19 @@ export default function AutoBuilder({ cursos, ramosSeleccionados, onAplicar, onN
                   <button
                     type="button"
                     onClick={() => onAplicar(resultado.paquetes)}
-                    className="mt-3 w-full rounded bg-verde px-3 py-2 text-[13px] font-medium text-white transition-colors hover:bg-verde-fuerte"
+                    className="mt-3 w-full rounded-full bg-azul px-3 py-2 text-[14px] font-medium text-white transition-colors hover:bg-azul-fuerte"
                   >
                     Usar este horario
                   </button>
                 </>
               ) : (
                 <div className="space-y-2.5">
-                  <p className="text-[13px] text-tope">{resultado.motivo}</p>
+                  <p className="text-[14px] text-tope">{resultado.motivo}</p>
 
                   {resultado.incompatibles?.length > 0 && (
                     <ul className="space-y-1">
                       {resultado.incompatibles.map(([a, b], i) => (
-                        <li key={i} className="rounded border-l-2 border-tope bg-tope-suave px-2.5 py-1.5 text-[12px] text-tope">
+                        <li key={i} className="rounded border-l-2 border-tope bg-tope-suave px-2.5 py-1.5 text-[13px] text-tope">
                           <strong className="font-semibold">{a}</strong> y{' '}
                           <strong className="font-semibold">{b}</strong> se pisan en todas sus secciones.
                         </li>
@@ -197,7 +197,7 @@ export default function AutoBuilder({ cursos, ramosSeleccionados, onAplicar, onN
                   )}
 
                   {resultado.grupoIncompatible?.length > 0 && (
-                    <div className="rounded border-l-2 border-tope bg-tope-suave px-2.5 py-2 text-[12px] text-tope">
+                    <div className="rounded border-l-2 border-tope bg-tope-suave px-2.5 py-2 text-[13px] text-tope">
                       <p>Estos {resultado.grupoIncompatible.length} ramos no caben juntos:</p>
                       <ul className="mt-1 list-disc pl-4">
                         {resultado.grupoIncompatible.map((n) => (
@@ -208,7 +208,7 @@ export default function AutoBuilder({ cursos, ramosSeleccionados, onAplicar, onN
                     </div>
                   )}
 
-                  <p className="text-[12px] text-apagado">
+                  <p className="text-[13px] text-apagado">
                     Saca uno de los ramos en conflicto y vuelve a armar, o arma el horario igual
                     y corrige los topes tú.
                   </p>
@@ -217,7 +217,7 @@ export default function AutoBuilder({ cursos, ramosSeleccionados, onAplicar, onN
                     <button
                       type="button"
                       onClick={() => armar(true)}
-                      className="w-full rounded border border-tolerado bg-tolerado-suave px-3 py-2 text-[12px] font-medium text-tolerado transition-colors hover:brightness-95"
+                      className="w-full rounded border border-tolerado bg-tolerado-suave px-3 py-2 text-[13px] font-medium text-tolerado transition-colors hover:brightness-95"
                     >
                       Armar de todas formas, con topes
                     </button>
@@ -226,7 +226,7 @@ export default function AutoBuilder({ cursos, ramosSeleccionados, onAplicar, onN
               )}
 
               {resultado.sinOpciones?.length > 0 && (
-                <p className="mt-2 text-[12px] text-tolerado">
+                <p className="mt-2 text-[13px] text-tolerado">
                   Sin secciones utilizables: {resultado.sinOpciones.join(', ')}.
                 </p>
               )}

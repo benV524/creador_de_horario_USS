@@ -82,16 +82,16 @@ export default function ScheduleView({
 
   if (paquetes.length === 0) {
     return (
-      <div className="rounded border border-dashed border-linea bg-hoja py-20 text-center">
-        <p className="text-[15px] font-semibold text-tinta">Tu horario está vacío</p>
-        <p className="mt-1 text-[13px] text-apagado">
+      <div className="rounded-2xl border border-dashed border-linea bg-hoja py-20 text-center">
+        <p className="text-[16px] font-semibold text-tinta">Tu horario está vacío</p>
+        <p className="mt-1 text-[14px] text-apagado">
           Agrega ramos uno a uno, o deja que la app pruebe las combinaciones por ti.
         </p>
         <div className="mt-5 flex justify-center gap-2">
           <button
             type="button"
             onClick={onIrABuscar}
-            className="rounded bg-verde px-4 py-2 text-[13px] font-medium text-white transition-colors hover:bg-verde-fuerte"
+            className="rounded-full bg-azul px-4 py-2 text-[14px] font-medium text-white transition-colors hover:bg-azul-fuerte"
           >
             Buscar ramos
           </button>
@@ -124,7 +124,7 @@ export default function ScheduleView({
             {topesPendientes.map((c) => (
               <div
                 key={c.clave}
-                className={`flex flex-wrap items-center gap-x-3 gap-y-2 rounded border-l-2 px-3 py-2 text-[13px] ${
+                className={`flex flex-wrap items-center gap-x-3 gap-y-2 rounded border-l-2 px-3 py-2 text-[14px] ${
                   c.permitido
                     ? 'border-tolerado bg-tolerado-suave text-tolerado'
                     : 'border-tope bg-tope-suave text-tope'
@@ -140,7 +140,7 @@ export default function ScheduleView({
                 <button
                   type="button"
                   onClick={() => alternarTope(c.clave)}
-                  className="shrink-0 rounded border border-current px-2.5 py-1 text-[12px] font-medium transition-colors hover:bg-black/5"
+                  className="shrink-0 rounded-full border border-current px-2.5 py-1 text-[13px] font-medium transition-colors hover:bg-black/5"
                 >
                   Dejarlo así
                 </button>
@@ -154,7 +154,7 @@ export default function ScheduleView({
             {topesResueltos.map((c) => (
               <div
                 key={c.clave}
-                className="flex flex-wrap items-center gap-x-3 gap-y-1 rounded border border-linea bg-hoja px-3 py-1.5 text-[12px] text-apagado"
+                className="flex flex-wrap items-center gap-x-3 gap-y-1 rounded-2xl border border-linea bg-hoja tarjeta px-3 py-1.5 text-[13px] text-apagado"
               >
                 <span className="flex-1">
                   Cruce aceptado entre {c.etiqueta} (
@@ -163,7 +163,7 @@ export default function ScheduleView({
                 <button
                   type="button"
                   onClick={() => alternarTope(c.clave)}
-                  className="shrink-0 font-medium text-verde hover:underline"
+                  className="shrink-0 font-medium text-azul hover:underline"
                 >
                   Deshacer
                 </button>
@@ -181,14 +181,14 @@ export default function ScheduleView({
       </div>
 
       <aside className="space-y-4">
-        <section className="rounded border border-linea bg-hoja">
+        <section className="rounded-2xl border border-linea bg-hoja tarjeta">
           <div className="flex items-center justify-between gap-2 border-b border-linea px-3 py-2.5">
             <h2 className="rotulo">Ramos ({paquetes.length})</h2>
-            <div className="flex items-center gap-2 text-[12px] font-medium">
+            <div className="flex items-center gap-2 text-[13px] font-medium">
               <button
                 type="button"
                 onClick={onIrABuscar}
-                className="text-verde hover:underline"
+                className="text-azul hover:underline"
               >
                 Agregar
               </button>
@@ -205,7 +205,7 @@ export default function ScheduleView({
 
           {confirmandoNuevo && (
             <div className="border-b border-linea bg-tolerado-suave px-3 py-2.5">
-              <p className="text-[12px] text-tolerado">
+              <p className="text-[13px] text-tolerado">
                 {horarioActivo
                   ? `"${horarioActivo.nombre}" tiene cambios sin guardar. Si empiezas de nuevo se pierden.`
                   : 'Este horario no está guardado. Si empiezas de nuevo se pierde.'}
@@ -214,14 +214,14 @@ export default function ScheduleView({
                 <button
                   type="button"
                   onClick={() => { setConfirmandoNuevo(false); onNuevoHorario() }}
-                  className="rounded bg-tolerado px-2.5 py-1 text-[12px] font-medium text-white hover:brightness-110"
+                  className="rounded-full bg-tolerado px-2.5 py-1 text-[13px] font-medium text-white hover:brightness-110"
                 >
                   Empezar de nuevo
                 </button>
                 <button
                   type="button"
                   onClick={() => setConfirmandoNuevo(false)}
-                  className="rounded border border-tolerado px-2.5 py-1 text-[12px] font-medium text-tolerado hover:bg-black/5"
+                  className="rounded-full border border-tolerado px-2.5 py-1 text-[13px] font-medium text-tolerado hover:bg-black/5"
                 >
                   Cancelar
                 </button>
@@ -238,7 +238,7 @@ export default function ScheduleView({
               return (
                 <li
                   key={p.clave}
-                  className={`px-3 py-2.5 transition-colors ${activo ? 'bg-verde-suave' : ''}`}
+                  className={`px-3 py-2.5 transition-colors ${activo ? 'bg-azul-suave' : ''}`}
                 >
                   <div className="flex items-start gap-2.5">
                     <span
@@ -250,17 +250,17 @@ export default function ScheduleView({
                       onClick={() => setClaveActiva(activo ? null : p.clave)}
                       className="min-w-0 flex-1 text-left"
                     >
-                      <p className="truncate text-[13px] font-semibold leading-snug" title={p.ramo}>
+                      <p className="truncate text-[14px] font-semibold leading-snug" title={p.ramo}>
                         {p.ramo}
                       </p>
-                      <p className="mt-0.5 text-[12px] text-apagado">
+                      <p className="mt-0.5 text-[13px] text-apagado">
                         {describirPaquete(p)}
                         {p.esIndependiente && (
-                          <span className="rotulo ml-1.5 text-[9px] text-tenue">independiente</span>
+                          <span className="rotulo ml-1.5 text-[10px] text-tenue">independiente</span>
                         )}
                       </p>
                       {alternativas > 1 && (
-                        <p className="mt-0.5 text-[11px] text-verde">
+                        <p className="mt-0.5 text-[12px] text-azul">
                           {alternativas} {p.esIndependiente ? 'secciones' : 'combinaciones'} para elegir
                         </p>
                       )}
@@ -268,7 +268,7 @@ export default function ScheduleView({
                     <button
                       type="button"
                       onClick={() => onQuitar(p.clave)}
-                      className="shrink-0 text-[13px] leading-none text-tenue transition-colors hover:text-tope"
+                      className="shrink-0 text-[14px] leading-none text-tenue transition-colors hover:text-tope"
                       title="Quitar del horario"
                     >
                       ✕
@@ -280,7 +280,7 @@ export default function ScheduleView({
                         key={s.nrc}
                         type="button"
                         onClick={() => onVerDetalle(s.nrc)}
-                        className="tabular rounded-[3px] border border-linea px-1.5 py-0.5 text-[10px] text-apagado transition-colors hover:border-verde-borde hover:bg-verde-suave hover:text-verde"
+                        className="tabular rounded-lg border border-linea px-1.5 py-0.5 text-[11px] text-apagado transition-colors hover:border-azul-borde hover:bg-azul-suave hover:text-azul"
                       >
                         {s.nrc}
                       </button>
@@ -292,18 +292,18 @@ export default function ScheduleView({
           </ul>
         </section>
 
-        <section className="rounded border border-linea bg-hoja">
+        <section className="rounded-2xl border border-linea bg-hoja tarjeta">
           <h2 className="rotulo border-b border-linea px-3 py-2.5">Guardar</h2>
           <div className="p-3">
             {horarioActivo && (
-              <div className="mb-2 rounded border border-verde-borde bg-verde-suave px-2.5 py-2">
-                <p className="truncate text-[12px] text-verde">
+              <div className="mb-2 rounded border border-azul-borde bg-azul-suave px-2.5 py-2">
+                <p className="truncate text-[13px] text-azul">
                   Abierto: <strong className="font-semibold">{horarioActivo.nombre}</strong>
                 </p>
                 <button
                   type="button"
                   onClick={onActualizarActivo}
-                  className="mt-1.5 w-full rounded bg-verde px-2 py-1.5 text-[12px] font-medium text-white transition-colors hover:bg-verde-fuerte"
+                  className="mt-1.5 w-full rounded-full bg-azul px-2 py-1.5 text-[13px] font-medium text-white transition-colors hover:bg-azul-fuerte"
                 >
                   Guardar cambios
                 </button>
@@ -323,12 +323,12 @@ export default function ScheduleView({
                 value={nombreNuevo}
                 onChange={(e) => setNombreNuevo(e.target.value)}
                 placeholder={horarioActivo ? 'Guardar como copia…' : 'Nombre del horario…'}
-                className="min-w-0 flex-1 rounded border border-linea bg-hoja px-2 py-1.5 text-[12px] placeholder:text-tenue focus:border-verde focus:outline-none"
+                className="min-w-0 flex-1 rounded-xl border border-linea bg-hoja px-2 py-1.5 text-[13px] placeholder:text-tenue focus:border-azul focus:outline-none"
               />
               <button
                 type="submit"
                 disabled={!nombreNuevo.trim()}
-                className="shrink-0 rounded border border-linea px-3 py-1.5 text-[12px] font-medium text-tinta transition-colors hover:border-verde-borde hover:bg-verde-suave hover:text-verde disabled:opacity-40 disabled:hover:border-linea disabled:hover:bg-transparent disabled:hover:text-tinta"
+                className="shrink-0 rounded-full border border-linea px-3 py-1.5 text-[13px] font-medium text-tinta transition-colors hover:border-azul-borde hover:bg-azul-suave hover:text-azul disabled:opacity-40 disabled:hover:border-linea disabled:hover:bg-transparent disabled:hover:text-tinta"
               >
                 Guardar
               </button>
@@ -336,14 +336,14 @@ export default function ScheduleView({
           </div>
         </section>
 
-        <section className="rounded border border-linea bg-hoja">
+        <section className="rounded-2xl border border-linea bg-hoja tarjeta">
           <h2 className="rotulo border-b border-linea px-3 py-2.5">Descargar</h2>
           <div className="flex gap-2 p-3">
             <button
               type="button"
               disabled={exportando}
               onClick={() => exportar('png')}
-              className="flex-1 rounded border border-linea px-3 py-2 text-[12px] font-medium transition-colors hover:border-verde-borde hover:bg-verde-suave hover:text-verde disabled:opacity-40"
+              className="flex-1 rounded-full border border-linea px-3 py-2 text-[13px] font-medium transition-colors hover:border-azul-borde hover:bg-azul-suave hover:text-azul disabled:opacity-40"
             >
               Imagen
             </button>
@@ -351,7 +351,7 @@ export default function ScheduleView({
               type="button"
               disabled={exportando}
               onClick={() => exportar('pdf')}
-              className="flex-1 rounded border border-linea px-3 py-2 text-[12px] font-medium transition-colors hover:border-verde-borde hover:bg-verde-suave hover:text-verde disabled:opacity-40"
+              className="flex-1 rounded-full border border-linea px-3 py-2 text-[13px] font-medium transition-colors hover:border-azul-borde hover:bg-azul-suave hover:text-azul disabled:opacity-40"
             >
               PDF
             </button>

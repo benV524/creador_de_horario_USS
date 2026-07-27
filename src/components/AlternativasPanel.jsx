@@ -23,7 +23,7 @@ function Horario({ paquete }) {
   return (
     <div className="mt-1.5 flex flex-wrap gap-1">
       {bloques.map((b, i) => (
-        <span key={i} className="tabular rounded-[3px] bg-papel px-1.5 py-0.5 text-[10px] text-apagado">
+        <span key={i} className="tabular rounded-lg bg-fondo px-1.5 py-0.5 text-[11px] text-apagado">
           {b.dia} {b.horaInicio}–{b.horaFin}
         </span>
       ))}
@@ -52,20 +52,20 @@ export default function AlternativasPanel({
   const libres = opciones.filter((o) => o.total === 0).length
 
   return (
-    <section className="rounded border border-linea bg-hoja">
+    <section className="rounded-2xl border border-linea bg-hoja tarjeta">
       <div className="flex items-start justify-between gap-2 border-b border-linea px-3 py-2.5">
         <div className="min-w-0">
           <p className="rotulo">
             Otras secciones {esIndependiente && '(suelta)'}
           </p>
-          <h2 className="mt-0.5 truncate text-[13px] font-semibold" title={ramo}>{ramo}</h2>
-          <p className="mt-0.5 text-[12px] text-apagado">
+          <h2 className="mt-0.5 truncate text-[14px] font-semibold" title={ramo}>{ramo}</h2>
+          <p className="mt-0.5 text-[13px] text-apagado">
             <span className="tabular">{opciones.length}</span>{' '}
             {esIndependiente
               ? (opciones.length === 1 ? 'sección' : 'secciones')
               : (opciones.length === 1 ? 'combinación' : 'combinaciones')}
             {' · '}
-            <span className={libres > 0 ? 'text-verde' : 'text-tolerado'}>
+            <span className={libres > 0 ? 'text-azul' : 'text-tolerado'}>
               <span className="tabular">{libres}</span> sin topes
             </span>
           </p>
@@ -73,7 +73,7 @@ export default function AlternativasPanel({
         <button
           type="button"
           onClick={onCerrar}
-          className="shrink-0 text-[13px] leading-none text-tenue transition-colors hover:text-tinta"
+          className="shrink-0 text-[14px] leading-none text-tenue transition-colors hover:text-tinta"
           title="Cerrar"
         >
           ✕
@@ -88,13 +88,13 @@ export default function AlternativasPanel({
           ).values()]
 
           return (
-            <div key={paquete.id} className={`px-3 py-2.5 ${esActual ? 'bg-verde-suave' : ''}`}>
+            <div key={paquete.id} className={`px-3 py-2.5 ${esActual ? 'bg-azul-suave' : ''}`}>
               <div className="flex items-center justify-between gap-2">
-                <p className="text-[12px] font-semibold">{describirPaquete(paquete)}</p>
+                <p className="text-[13px] font-semibold">{describirPaquete(paquete)}</p>
                 {total === 0 ? (
-                  <span className="rotulo shrink-0 text-[9px] text-verde">libre</span>
+                  <span className="rotulo shrink-0 text-[10px] text-azul">libre</span>
                 ) : (
-                  <span className={`rotulo shrink-0 text-[9px] ${prohibidos > 0 ? 'text-tope' : 'text-tolerado'}`}>
+                  <span className={`rotulo shrink-0 text-[10px] ${prohibidos > 0 ? 'text-tope' : 'text-tolerado'}`}>
                     {total} tope{total === 1 ? '' : 's'}
                   </span>
                 )}
@@ -102,7 +102,7 @@ export default function AlternativasPanel({
 
               <Horario paquete={paquete} />
 
-              <p className="mt-1 truncate text-[11px] text-apagado">
+              <p className="mt-1 truncate text-[12px] text-apagado">
                 {[...new Set(paquete.secciones.map((s) => s.profesorDisplay).filter(Boolean))].join(' · ') || 'Profesor no informado'}
               </p>
 
@@ -111,7 +111,7 @@ export default function AlternativasPanel({
                   {choquesUnicos.map((c, i) => (
                     <li
                       key={i}
-                      className={`text-[11px] ${c.permitido ? 'text-tolerado' : 'text-tope'}`}
+                      className={`text-[12px] ${c.permitido ? 'text-tolerado' : 'text-tope'}`}
                     >
                       Se pisa con {c.con} (<span className="tabular">{c.dia} {c.hora}</span>)
                       {!c.permitido && ' — mismo tipo'}
@@ -121,16 +121,16 @@ export default function AlternativasPanel({
               )}
 
               <div className="mt-2 flex items-center gap-2">
-                <span className="tabular flex-1 text-[10px] text-tenue">
+                <span className="tabular flex-1 text-[11px] text-tenue">
                   {paquete.nrcs.join(' · ')}
                 </span>
                 {esActual ? (
-                  <span className="rotulo text-[9px] text-verde">en uso</span>
+                  <span className="rotulo text-[10px] text-azul">en uso</span>
                 ) : (
                   <button
                     type="button"
                     onClick={() => onElegir(paquete)}
-                    className="rounded bg-verde px-2.5 py-1 text-[11px] font-medium text-white transition-colors hover:bg-verde-fuerte"
+                    className="rounded-full bg-azul px-2.5 py-1 text-[12px] font-medium text-white transition-colors hover:bg-azul-fuerte"
                   >
                     Usar esta
                   </button>
@@ -141,7 +141,7 @@ export default function AlternativasPanel({
         })}
 
         {opciones.length === 0 && (
-          <p className="px-3 py-10 text-center text-[12px] text-apagado">
+          <p className="px-3 py-10 text-center text-[13px] text-apagado">
             Este ramo no tiene otras combinaciones en el archivo.
           </p>
         )}

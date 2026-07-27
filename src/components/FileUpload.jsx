@@ -41,8 +41,8 @@ export default function FileUpload({ onCargado }) {
         onClick={() => inputRef.current?.click()}
         className={`w-full rounded border border-dashed px-8 py-12 text-center transition-colors ${
           arrastrando
-            ? 'border-verde bg-verde-suave'
-            : 'border-linea bg-hoja hover:border-verde-borde hover:bg-verde-suave/50'
+            ? 'border-azul bg-azul-suave'
+            : 'border-linea bg-hoja hover:border-azul-borde hover:bg-azul-suave/50'
         }`}
       >
         <input
@@ -52,27 +52,27 @@ export default function FileUpload({ onCargado }) {
           className="hidden"
           onChange={(e) => procesarArchivo(e.target.files?.[0])}
         />
-        <p className="text-[15px] font-semibold text-tinta">
+        <p className="text-[16px] font-semibold text-tinta">
           {cargando ? 'Leyendo el archivo…' : 'Arrastra aquí el Excel de horarios'}
         </p>
-        <p className="mt-1 text-[13px] text-apagado">
+        <p className="mt-1 text-[14px] text-apagado">
           {cargando ? 'Un momento.' : 'O haz clic para buscarlo en tu computador.'}
         </p>
       </button>
 
-      <div className="mt-4 rounded border border-linea bg-hoja px-4 py-3">
+      <div className="mt-4 rounded-2xl border border-linea bg-hoja tarjeta px-4 py-3">
         <p className="rotulo">Columnas que necesita</p>
-        <p className="tabular mt-1.5 text-[12px] leading-relaxed text-apagado">
+        <p className="tabular mt-1.5 text-[13px] leading-relaxed text-apagado">
           NRC · TIPO · SECCION · COMPONENTE · NOMBRE · LIGA · CONECTOR · HR_INICIO ·
           LUNES a SABADO · NOMBRE_ · APELLIDO
         </p>
-        <p className="mt-2 text-[12px] text-tenue">
+        <p className="mt-2 text-[13px] text-tenue">
           El archivo se lee en tu navegador y no se envía a ningún servidor.
         </p>
       </div>
 
       {error && (
-        <p className="mt-3 rounded border-l-2 border-tope bg-tope-suave px-3 py-2 text-[13px] text-tope">
+        <p className="mt-3 rounded border-l-2 border-tope bg-tope-suave px-3 py-2 text-[14px] text-tope">
           {error}
         </p>
       )}

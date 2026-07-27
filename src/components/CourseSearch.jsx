@@ -6,14 +6,14 @@ const norm = (s) => String(s ?? '')
   .replace(/[̀-ͯ]/g, '')
   .toLowerCase()
 
-const CAMPO = 'rounded border border-linea bg-hoja px-2.5 py-2 text-[13px] placeholder:text-tenue focus:border-verde focus:outline-none'
+const CAMPO = 'rounded-xl border border-linea bg-hoja px-2.5 py-2 text-[14px] placeholder:text-tenue focus:border-azul focus:outline-none'
 
 function Bloques({ bloques }) {
   if (bloques.length === 0) return <span className="text-tenue">Sin horario</span>
   return (
     <span className="flex flex-wrap gap-1">
       {bloques.map((b, i) => (
-        <span key={i} className="tabular rounded-[3px] bg-papel px-1.5 py-0.5 text-[11px] text-apagado">
+        <span key={i} className="tabular rounded-lg bg-fondo px-1.5 py-0.5 text-[12px] text-apagado">
           {b.dia} {b.horaInicio}–{b.horaFin}
         </span>
       ))}
@@ -101,7 +101,7 @@ export default function CourseSearch({
 
   return (
     <div>
-      <div className="rounded border border-linea bg-hoja p-3">
+      <div className="rounded-2xl border border-linea bg-hoja tarjeta p-3">
         <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-4">
           <input
             className={CAMPO}
@@ -124,13 +124,13 @@ export default function CourseSearch({
             {DIAS.map((d) => <option key={d.letra} value={d.letra}>{d.nombre}</option>)}
           </select>
           <div className="flex items-center gap-2 sm:col-span-2">
-            <span className="whitespace-nowrap text-[12px] text-apagado">Empieza entre</span>
+            <span className="whitespace-nowrap text-[13px] text-apagado">Empieza entre</span>
             <input type="time" className={`${CAMPO} tabular w-full`} value={horaDesde} onChange={(e) => setHoraDesde(e.target.value)} />
-            <span className="text-[12px] text-tenue">y</span>
+            <span className="text-[13px] text-tenue">y</span>
             <input type="time" className={`${CAMPO} tabular w-full`} value={horaHasta} onChange={(e) => setHoraHasta(e.target.value)} />
           </div>
           <div className="flex items-center gap-2 sm:col-span-2">
-            <p className="flex-1 text-[13px] text-apagado">
+            <p className="flex-1 text-[14px] text-apagado">
               <span className="tabular font-medium text-tinta">{grupos.length}</span> ramos ·{' '}
               <span className="tabular">{totalSecciones}</span> secciones
             </p>
@@ -138,7 +138,7 @@ export default function CourseSearch({
               <button
                 type="button"
                 onClick={limpiar}
-                className="rounded border border-linea px-3 py-2 text-[12px] font-medium text-apagado transition-colors hover:border-verde-borde hover:bg-verde-suave hover:text-verde"
+                className="rounded-full border border-linea px-3 py-2 text-[13px] font-medium text-apagado transition-colors hover:border-azul-borde hover:bg-azul-suave hover:text-azul"
               >
                 Limpiar filtros
               </button>
@@ -156,32 +156,32 @@ export default function CourseSearch({
           return (
             <div
               key={g.nombre}
-              className={`overflow-hidden rounded border bg-hoja ${
-                enHorario ? 'border-verde-borde' : 'border-linea'
+              className={`overflow-hidden rounded-2xl border bg-hoja tarjeta ${
+                enHorario ? 'border-azul-borde' : 'border-linea'
               }`}
             >
               <button
                 type="button"
                 onClick={() => alternar(g.nombre)}
                 aria-expanded={abierto}
-                className="flex w-full items-center gap-3 px-3 py-2.5 text-left transition-colors hover:bg-papel"
+                className="flex w-full items-center gap-3 px-3 py-2.5 text-left transition-colors hover:bg-fondo"
               >
-                <span className={`text-[10px] text-tenue transition-transform ${abierto ? 'rotate-90' : ''}`}>▶</span>
+                <span className={`text-[11px] text-tenue transition-transform ${abierto ? 'rotate-90' : ''}`}>▶</span>
                 <span className="flex-1">
-                  <span className="block text-[13px] font-semibold leading-snug">{g.nombre}</span>
-                  <span className="block text-[12px] text-apagado">
+                  <span className="block text-[14px] font-semibold leading-snug">{g.nombre}</span>
+                  <span className="block text-[13px] text-apagado">
                     {g.tipos} · <span className="tabular">{g.secciones.length}</span> secciones
                   </span>
                 </span>
                 {enHorario && (
-                  <span className="rotulo shrink-0 text-[9px] text-verde">en tu horario</span>
+                  <span className="rotulo shrink-0 text-[10px] text-azul">en tu horario</span>
                 )}
               </button>
 
               {abierto && (
                 <div className="border-t border-linea">
                   {enHorario && paquete && (
-                    <div className="flex items-center justify-between gap-2 border-b border-linea bg-verde-suave px-3 py-1.5 text-[12px] text-verde">
+                    <div className="flex items-center justify-between gap-2 border-b border-linea bg-azul-suave px-3 py-1.5 text-[13px] text-azul">
                       <span>Estás tomando {describir(paquete)}</span>
                       <button
                         type="button"
@@ -197,33 +197,33 @@ export default function CourseSearch({
                       {g.secciones.map((c) => {
                         const activa = nrcsSeleccionados.has(c.nrc)
                         return (
-                          <tr key={c.nrc} className={activa ? 'bg-verde-suave/50' : ''}>
+                          <tr key={c.nrc} className={activa ? 'bg-azul-suave/50' : ''}>
                             <td className="w-20 px-3 py-2 align-top">
                               <button
                                 type="button"
                                 onClick={() => onVerDetalle(c.nrc)}
-                                className="tabular text-[12px] text-verde hover:underline"
+                                className="tabular text-[13px] text-azul hover:underline"
                               >
                                 {c.nrc}
                               </button>
                             </td>
-                            <td className="w-24 px-2 py-2 align-top text-[12px]">
+                            <td className="w-24 px-2 py-2 align-top text-[13px]">
                               <span className="font-medium">{c.componente}</span>{' '}
                               <span className="tabular">{c.seccion}</span>
                             </td>
                             <td className="px-2 py-2 align-top"><Bloques bloques={c.bloques} /></td>
-                            <td className="px-2 py-2 align-top text-[12px] text-apagado">
+                            <td className="px-2 py-2 align-top text-[13px] text-apagado">
                               {c.profesorDisplay || '—'}
                             </td>
                             <td className="w-44 px-3 py-2 text-right align-top">
                               {activa ? (
-                                <span className="rotulo text-[9px] text-verde">elegida</span>
+                                <span className="rotulo text-[10px] text-azul">elegida</span>
                               ) : (
                                 <div className="flex justify-end gap-1.5">
                                   <button
                                     type="button"
                                     onClick={() => onAgregar(c.nrc)}
-                                    className="rounded bg-verde px-2.5 py-1 text-[12px] font-medium text-white transition-colors hover:bg-verde-fuerte"
+                                    className="rounded-full bg-azul px-2.5 py-1 text-[13px] font-medium text-white transition-colors hover:bg-azul-fuerte"
                                     title={c.conectados.length > 0
                                       ? 'Agrega la sección junto con su liga'
                                       : 'Agrega la sección'}
@@ -233,7 +233,7 @@ export default function CourseSearch({
                                   <button
                                     type="button"
                                     onClick={() => onAgregarIndependiente(c.nrc)}
-                                    className="rounded border border-linea px-2 py-1 text-[12px] font-medium text-apagado transition-colors hover:border-verde-borde hover:text-verde"
+                                    className="rounded-full border border-linea px-2 py-1 text-[13px] font-medium text-apagado transition-colors hover:border-azul-borde hover:text-azul"
                                     title="Agrega solo esta sección, sin su liga y sin reemplazar el ramo que ya tengas"
                                   >
                                     Suelta
@@ -253,9 +253,9 @@ export default function CourseSearch({
         })}
 
         {grupos.length === 0 && (
-          <div className="rounded border border-dashed border-linea bg-hoja py-14 text-center">
-            <p className="text-[13px] font-medium text-tinta">Ningún ramo coincide</p>
-            <p className="mt-1 text-[12px] text-apagado">Prueba con menos filtros.</p>
+          <div className="rounded-2xl border border-dashed border-linea bg-hoja py-14 text-center">
+            <p className="text-[14px] font-medium text-tinta">Ningún ramo coincide</p>
+            <p className="mt-1 text-[13px] text-apagado">Prueba con menos filtros.</p>
           </div>
         )}
       </div>

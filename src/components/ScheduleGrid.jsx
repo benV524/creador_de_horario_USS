@@ -31,7 +31,7 @@ export default function ScheduleGrid({ paquetes, franjas, topesAceptados, onSele
   const altoFranja = (f) => (f.finMin - f.inicioMin) * PX_POR_MIN
 
   return (
-    <div className="overflow-hidden rounded border border-linea bg-hoja shadow-[0_1px_3px_rgba(26,31,28,0.06)]">
+    <div className="overflow-hidden rounded-2xl border border-linea bg-hoja tarjeta shadow-[0_1px_3px_rgba(26,31,28,0.06)]">
       <div
         className="grid"
         style={{ gridTemplateColumns: `${ANCHO_HORA}px repeat(6, minmax(0, 1fr))` }}
@@ -44,11 +44,11 @@ export default function ScheduleGrid({ paquetes, franjas, topesAceptados, onSele
             key={d.letra}
             className={`rotulo relative border-b border-linea px-2 py-3 text-center ${
               i < DIAS.length - 1 ? 'border-r' : ''
-            } ${d.letra === hoy ? 'text-verde' : ''}`}
+            } ${d.letra === hoy ? 'text-azul' : ''}`}
           >
             {d.nombre}
             {d.letra === hoy && (
-              <span className="absolute inset-x-0 bottom-0 h-[2px] bg-verde" aria-hidden="true" />
+              <span className="absolute inset-x-0 bottom-0 h-[2px] bg-azul" aria-hidden="true" />
             )}
           </div>
         ))}
@@ -57,7 +57,7 @@ export default function ScheduleGrid({ paquetes, franjas, topesAceptados, onSele
           {franjas.map((f) => (
             <div
               key={f.inicioMin}
-              className="tabular flex items-center justify-center border-b border-linea-suave px-2 text-center text-[12px] text-apagado"
+              className="tabular flex items-center justify-center border-b border-linea-suave px-2 text-center text-[13px] text-apagado"
               style={{ height: altoFranja(f) }}
             >
               {f.etiqueta}
@@ -69,7 +69,7 @@ export default function ScheduleGrid({ paquetes, franjas, topesAceptados, onSele
           <div
             key={d.letra}
             className={`relative ${iDia < DIAS.length - 1 ? 'border-r border-linea' : ''} ${
-              d.letra === hoy ? 'bg-verde-suave/40' : ''
+              d.letra === hoy ? 'bg-azul-suave/40' : ''
             }`}
           >
             {franjas.map((f) => (
@@ -93,7 +93,7 @@ export default function ScheduleGrid({ paquetes, franjas, topesAceptados, onSele
                     type="button"
                     key={clave}
                     onClick={() => onSeleccionarRamo?.(ev.clave)}
-                    className={`absolute overflow-hidden rounded-[3px] px-2 py-1.5 text-left leading-tight text-white transition hover:brightness-110 ${
+                    className={`absolute overflow-hidden rounded-lg px-2 py-1.5 text-left leading-tight text-white transition hover:brightness-110 ${
                       enChoque ? 'z-10 ring-2 ring-tope ring-offset-1' : ''
                     } ${aceptado ? 'ring-[1.5px] ring-dashed ring-tolerado ring-offset-1' : ''}`}
                     style={{
@@ -105,14 +105,14 @@ export default function ScheduleGrid({ paquetes, franjas, topesAceptados, onSele
                     }}
                     title={`${ev.ramo} · ${ev.componente} ${ev.seccion} · NRC ${ev.nrc}\n${ev.horaInicio}–${ev.horaFin}\n${ev.profesor}${aceptado ? '\n(tope aceptado)' : ''}`}
                   >
-                    <p className="truncate text-[11px] font-semibold">{ev.ramo}</p>
+                    <p className="truncate text-[12px] font-semibold">{ev.ramo}</p>
                     {alto > 40 && (
-                      <p className="tabular truncate text-[10px] opacity-95">
+                      <p className="tabular truncate text-[11px] opacity-95">
                         {ev.componente} {ev.seccion} · {ev.horaInicio}–{ev.horaFin}
                       </p>
                     )}
                     {alto > 62 && ev.profesor && (
-                      <p className="truncate text-[10px] opacity-75">{ev.profesor}</p>
+                      <p className="truncate text-[11px] opacity-75">{ev.profesor}</p>
                     )}
                   </button>
                 )

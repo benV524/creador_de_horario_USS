@@ -1,31 +1,31 @@
 @import "tailwindcss";
 
 /*
-  Paleta "verde pizarra". El verde es el color de identidad; el rojo NO se usa como
-  acento porque tiene un trabajo asignado: marcar los topes de horario. Perder esa
-  señal por decoración sería un mal negocio.
+  Paleta tomada del portal de la USS: azul marino institucional, lavanda claro para los
+  fondos suaves y tarjetas blancas sobre gris muy tenue. El rojo se mantiene fuera de la
+  identidad porque tiene un trabajo asignado: marcar los topes de horario.
 */
 @theme {
-  --color-papel: #faf9f5;
+  --color-fondo: #f6f7fb;
   --color-hoja: #ffffff;
-  --color-tinta: #1a1f1c;
-  --color-apagado: #6b736d;
-  --color-tenue: #949b95;
-  --color-linea: #e2e6e2;
-  --color-linea-suave: #eef1ee;
+  --color-tinta: #1c2233;
+  --color-apagado: #6b7280;
+  --color-tenue: #9aa1ae;
+  --color-linea: #e8eaf0;
+  --color-linea-suave: #f1f2f7;
 
-  --color-verde: #24503c;
-  --color-verde-fuerte: #1a3c2c;
-  --color-verde-suave: #edf2ef;
-  --color-verde-borde: #c6d6cd;
+  --color-azul: #22307d;
+  --color-azul-fuerte: #182459;
+  --color-azul-claro: #7d89d4;
+  --color-azul-suave: #eaecfa;
+  --color-azul-borde: #c9cff0;
 
   --color-tope: #c02a2a;
   --color-tope-suave: #fbeceb;
   --color-tolerado: #b4740e;
   --color-tolerado-suave: #fdf3e3;
 
-  --font-sans: "Archivo", system-ui, -apple-system, "Segoe UI", sans-serif;
-  --font-mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  --font-sans: "Poppins", system-ui, -apple-system, "Segoe UI", sans-serif;
 }
 
 /* Un solo tema: la página se ve igual aunque el sistema esté en oscuro. */
@@ -39,39 +39,41 @@ html {
 
 body {
   margin: 0;
-  background-color: var(--color-papel);
+  background-color: var(--color-fondo);
   color: var(--color-tinta);
   font-family: var(--font-sans);
-  font-size: 14px;
-  line-height: 1.5;
+  font-size: 15px;
+  line-height: 1.55;
   -webkit-font-smoothing: antialiased;
 }
 
-/* Las horas y los NRC son datos tabulares: deben alinearse en columna. */
+/* Las horas y los NRC se comparan en columna, así que van con cifras de ancho fijo. */
 .tabular {
-  font-family: var(--font-mono);
   font-variant-numeric: tabular-nums;
-  letter-spacing: -0.01em;
 }
 
-/* Microtítulo de sección: el recurso estructural que se repite en toda la app. */
+/* Microtítulo de sección. */
 .rotulo {
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 600;
-  letter-spacing: 0.09em;
-  text-transform: uppercase;
+  letter-spacing: 0.04em;
   color: var(--color-apagado);
 }
 
+/* Sombra difusa de tarjeta, como las del portal. */
+.tarjeta {
+  box-shadow: 0 1px 2px rgba(28, 34, 51, 0.04), 0 4px 16px rgba(28, 34, 51, 0.05);
+}
+
 :focus-visible {
-  outline: 2px solid var(--color-verde);
+  outline: 2px solid var(--color-azul);
   outline-offset: 2px;
-  border-radius: 2px;
+  border-radius: 4px;
 }
 
 ::selection {
-  background: var(--color-verde-suave);
-  color: var(--color-verde-fuerte);
+  background: var(--color-azul-suave);
+  color: var(--color-azul);
 }
 
 @media (prefers-reduced-motion: reduce) {

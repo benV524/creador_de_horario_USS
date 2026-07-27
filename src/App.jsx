@@ -6,6 +6,7 @@ import ScheduleView from './components/ScheduleView'
 import AutoBuilder from './components/AutoBuilder'
 import SavedSchedules from './components/SavedSchedules'
 import Avisos from './components/Avisos'
+import Icono from './components/Icono'
 import { SpeedInsights } from '@vercel/speed-insights/react'
 import {
   mejorPaqueteParaSeccion,
@@ -228,29 +229,32 @@ function App() {
   const cursoDetalle = nrcDetalle ? cursosPorNrc.get(nrcDetalle) : null
 
   return (
-    <div className="min-h-screen bg-papel text-tinta">
+    <div className="min-h-screen bg-fondo text-tinta">
       <Avisos avisos={avisos} />
 
       <header className="border-b border-linea bg-hoja">
-        <div className="mx-auto flex max-w-[1760px] flex-wrap items-center justify-between gap-4 px-5 py-4">
-          <div className="flex items-baseline gap-3">
-            <h1 className="text-[19px] font-bold leading-none tracking-[-0.02em]">
-              Horario <span className="text-verde">USS</span>
-            </h1>
-            <p className="hidden text-[13px] text-apagado sm:block">
-              Arma tu horario sin topes.
-            </p>
+        <div className="mx-auto flex max-w-[1760px] flex-wrap items-center justify-between gap-4 px-6 py-3.5">
+          <div className="flex items-center gap-3">
+            <Icono nombre="horario" />
+            <div>
+              <h1 className="text-[19px] font-bold leading-tight tracking-[-0.01em] text-azul">
+                Horario USS
+              </h1>
+              <p className="text-[13px] leading-tight text-apagado">
+                Arma tu horario sin topes
+              </p>
+            </div>
           </div>
           {datos && (
-            <div className="flex items-center gap-3 text-[13px]">
+            <div className="flex items-center gap-3 text-[14px]">
               <span className="hidden text-apagado md:inline">
-                <span className="tabular">{datos.cursos.length}</span> secciones ·{' '}
-                {datos.nombreArchivo}
+                <span className="tabular font-medium text-tinta">{datos.cursos.length}</span>{' '}
+                secciones · {datos.nombreArchivo}
               </span>
               <button
                 type="button"
                 onClick={() => { setDatos(null); setPaquetes([]) }}
-                className="rounded border border-linea px-2.5 py-1 font-medium text-apagado transition-colors hover:border-verde-borde hover:bg-verde-suave hover:text-verde"
+                className="rounded-full bg-azul-suave px-4 py-2 text-[13px] font-semibold text-azul transition-colors hover:bg-azul-borde"
               >
                 Cargar otro Excel
               </button>
@@ -264,7 +268,7 @@ function App() {
           <div className="mx-auto max-w-xl pt-16">
             <FileUpload onCargado={setDatos} />
             {horariosGuardados.length > 0 && (
-              <p className="mt-4 text-center text-[13px] text-apagado">
+              <p className="mt-4 text-center text-[14px] text-apagado">
                 Tienes <span className="tabular font-medium text-tinta">{horariosGuardados.length}</span>{' '}
                 horario{horariosGuardados.length === 1 ? '' : 's'} guardado
                 {horariosGuardados.length === 1 ? '' : 's'}. Sube el Excel para abrirlos.
@@ -274,12 +278,12 @@ function App() {
         ) : (
           <>
             {datos.warnings.length > 0 && (
-              <div className="mb-4 rounded border-l-2 border-tolerado bg-tolerado-suave px-3 py-2 text-[13px] text-tolerado">
+              <div className="mb-4 rounded-xl border-l-4 border-tolerado bg-tolerado-suave px-4 py-3 text-[14px] text-tolerado">
                 {datos.warnings.map((w, i) => <p key={i}>{w}</p>)}
               </div>
             )}
 
-            <nav className="mb-5 flex gap-6 border-b border-linea">
+            <nav className="mb-5 flex flex-wrap gap-2">
               {VISTAS.map((v) => {
                 const activa = vista === v.id
                 const cuenta = v.id === 'horario'
@@ -291,15 +295,19 @@ function App() {
                     type="button"
                     onClick={() => setVista(v.id)}
                     aria-current={activa ? 'page' : undefined}
-                    className={`-mb-px border-b-2 pb-2.5 text-[13px] font-medium transition-colors ${
+                    className={`rounded-full px-4 py-2 text-[14px] font-semibold transition-colors ${
                       activa
-                        ? 'border-verde text-verde'
-                        : 'border-transparent text-apagado hover:text-tinta'
+                        ? 'bg-azul text-white'
+                        : 'bg-hoja text-apagado hover:bg-azul-suave hover:text-azul'
                     }`}
                   >
                     {v.etiqueta}
                     {cuenta > 0 && (
-                      <span className={`tabular ml-1.5 text-[12px] ${activa ? 'text-verde' : 'text-tenue'}`}>
+                      <span
+                        className={`tabular ml-2 rounded-full px-1.5 py-0.5 text-[12px] ${
+                          activa ? 'bg-white/20 text-white' : 'bg-azul-suave text-azul'
+                        }`}
+                      >
                         {cuenta}
                       </span>
                     )}

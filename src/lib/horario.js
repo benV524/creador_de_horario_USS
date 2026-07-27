@@ -3,19 +3,19 @@ import { seSuperponen, topePermitido } from './armador.js'
 
 // Paleta estable para diferenciar ramos en la grilla. Son tonos profundos y algo
 // desaturados: se distinguen entre sí, aguantan texto blanco encima y conviven con el
-// papel sin competir. Se evita el rojo, reservado para los topes, y el verde de
+// papel sin competir. Se evita el rojo, reservado para los topes, y el azul de
 // identidad, para que un ramo no se confunda con la interfaz.
 const PALETA = [
-  '#31607f', // azul acero
-  '#a2542e', // terracota
-  '#5b4b8a', // morado apagado
-  '#2e7266', // verde mar
-  '#8c6d1f', // mostaza
-  '#9c3b5a', // vino
-  '#4a6c2f', // oliva
-  '#6b4e3d', // café
-  '#3f5a8a', // azul pizarra
-  '#7d4a6b', // ciruela
+  '#2a6491', // azul acero
+  '#b0552a', // terracota
+  '#5f4795', // morado
+  '#1d7a64', // verde azulado
+  '#a83a59', // frambuesa
+  '#8a6a0d', // mostaza
+  '#456f26', // verde hoja
+  '#39579b', // azul índigo
+  '#8a4a7d', // ciruela
+  '#7a5540', // café
 ]
 
 export function colorParaClave(clave, clavesOrdenadas) {

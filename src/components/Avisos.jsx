@@ -1,5 +1,5 @@
 const ESTILOS = {
-  ok: 'border-l-verde bg-hoja text-tinta',
+  ok: 'border-l-azul bg-hoja text-tinta',
   aviso: 'border-l-tolerado bg-hoja text-tinta',
   error: 'border-l-tope bg-hoja text-tinta',
 }
@@ -14,7 +14,7 @@ export default function Avisos({ avisos }) {
       {avisos.map((a) => (
         <div
           key={a.id}
-          className={`rounded border border-linea border-l-[3px] px-3 py-2 text-[13px] shadow-[0_2px_8px_rgba(26,31,28,0.10)] ${
+          className={`rounded border border-linea border-l-[3px] px-3 py-2 text-[14px] shadow-[0_2px_8px_rgba(26,31,28,0.10)] ${
             ESTILOS[a.tono] ?? ESTILOS.ok
           }`}
         >
